@@ -29,8 +29,8 @@ pnpm build
 
 ```sh
 pnpm --filter <extension> dev   # rebuild on every change
-pnpm check                      # lint, typecheck and unit tests
-pnpm format                     # apply Biome fixes
+pnpm check                      # lint, format check, typecheck and unit tests
+pnpm format                     # apply Biome formatting and safe fixes
 ```
 
 ## Share

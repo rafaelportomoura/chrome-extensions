@@ -8,9 +8,10 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "lint": "biome check .",
+    "lint": "biome lint .",
     "format": "biome check --write .",
-    "check": "pnpm lint && pnpm typecheck && pnpm test",
+    "format:check": "biome check --linter-enabled=false .",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
     "zip": "scripts/zip.sh"
   },
   "devDependencies": {
