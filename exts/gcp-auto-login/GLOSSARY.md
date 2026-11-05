@@ -1,4 +1,4 @@
-# gcloud Auto Login
+# GCP Auto login
 
 Completes the Google sign-in pages that the gcloud CLI opens, without the user clicking through
 them.

@@ -5,9 +5,9 @@ locally with Chrome's "Load unpacked"; none is published to the Chrome Web Store
 
 ## Extensions
 
-| Folder                                        | Name              | What it does                                                                                                       |
-| --------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [`exts/gcp-auto-login`](exts/gcp-auto-login/) | gcloud Auto Login | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`. |
+| Folder                                        | Name           | What it does                                                                                                       |
+| --------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| [`exts/gcp-auto-login`](exts/gcp-auto-login/) | GCP Auto login | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`. |
 
 Each extension folder has its own `README.md` (how it works, settings, limitations),
 `GLOSSARY.md` and `DESCRIPTION.md` (what it is, for sharing).

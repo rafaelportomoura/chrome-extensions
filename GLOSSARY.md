@@ -23,5 +23,5 @@ _Avoid_: Sideload, dev install
 
 ## Contexts
 
-- [gcloud Auto Login](exts/gcp-auto-login/GLOSSARY.md): signs in through the Google pages opened
+- [GCP Auto login](exts/gcp-auto-login/GLOSSARY.md): signs in through the Google pages opened
   by the gcloud CLI

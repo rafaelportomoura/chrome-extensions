@@ -1,4 +1,4 @@
-# gcloud Auto Login
+# GCP Auto login
 
 Clicks through the Google sign-in pages that `gcloud auth login` and
 `gcloud auth application-default login` open in the browser: the account chooser, the
