@@ -1,9 +1,18 @@
-// Clicks through one accounts.google.com page: the account chooser, the "Select all"
-// scopes checkbox and the Continue / Allow buttons.
+// Clicks through one sign-in page: the account chooser (Google's, or the Microsoft SSO one a
+// Google Workspace account federates to), the "Select all" scopes checkbox and the
+// Continue / Allow buttons.
 import { log } from "./log";
 
 export const CONTINUE_LABELS = ["continue", "allow", "continuar", "permitir"];
 export const SELECT_ALL_LABELS = ["select all", "selecionar tudo", "selecionar todos"];
+
+/**
+ * Account tiles carry the account email in an attribute: `data-identifier` / `data-email` on
+ * Google, `data-test-id` on Microsoft (whose tiles also hold `<email>-menu-dots` menu buttons,
+ * which the email check below rejects).
+ */
+const ACCOUNT_ATTRIBUTES = ["data-identifier", "data-email", "data-test-id"];
+const EMAIL = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 
 export interface PageContext {
   doc: Document;
@@ -18,11 +27,11 @@ export function advance(ctx: PageContext): boolean {
 }
 
 export function pickAccount(ctx: PageContext): boolean {
-  const accounts = candidates(ctx, "[data-identifier], [data-email]");
+  const accounts = candidates(ctx, ACCOUNT_ATTRIBUTES.map((name) => `[${name}]`).join(", ")).filter(
+    (el) => EMAIL.test(emailOf(el)),
+  );
   if (accounts.length === 0) return false;
 
-  const emailOf = (el: HTMLElement): string =>
-    (el.getAttribute("data-identifier") || el.getAttribute("data-email") || "").toLowerCase();
   const preferred = ctx.preferredEmail.trim().toLowerCase();
 
   let target: HTMLElement | undefined;
@@ -56,6 +65,11 @@ export function clickContinue(ctx: PageContext): boolean {
 
   log("clicking", button.textContent?.trim());
   return click(ctx, button);
+}
+
+function emailOf(el: HTMLElement): string {
+  const attribute = ACCOUNT_ATTRIBUTES.find((name) => el.getAttribute(name));
+  return (attribute ? (el.getAttribute(attribute) ?? "") : "").trim().toLowerCase();
 }
 
 function candidates(ctx: PageContext, selector: string): HTMLElement[] {

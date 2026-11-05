@@ -19,7 +19,8 @@ A browser tab that reached a page carrying an Allowed client within the last fiv
 _Avoid_: Session, login in progress
 
 **Preferred account**:
-The Google account picked automatically on the account chooser.
+The account picked automatically on the account chooser, on Google and on the Microsoft SSO page
+a federated Google Workspace account signs in through.
 _Avoid_: Default account, user
 
 **Success page**:

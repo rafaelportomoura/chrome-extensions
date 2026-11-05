@@ -52,6 +52,45 @@ describe("account chooser", () => {
   });
 });
 
+describe("Microsoft SSO account chooser", () => {
+  // Markup captured from login.microsoftonline.com's "Escolha uma conta" page.
+  const chooser = `
+    <div role="listitem" class="row tile">
+      <div role="button" class="table" data-test-id="rafael.porto.consult@patria.com">
+        Porto, Rafael Rafael.Porto.Consult@patria.com Entrou
+      </div>
+      <div role="button" data-test-id="rafael.porto.consult@patria.com-menu-dots"></div>
+    </div>
+    <div role="listitem" class="row tile">
+      <div role="button" class="table" data-test-id="rafael.moura@climbee.com">
+        Rafael Moura rafael.moura@climbee.com Entrou
+      </div>
+      <div role="button" data-test-id="rafael.moura@climbee.com-menu-dots"></div>
+    </div>`;
+
+  it("picks the preferred account tile, not its menu button", () => {
+    const ctx = page(chooser, "Rafael.Porto.Consult@patria.com");
+    const tile = onClick('[data-test-id="rafael.porto.consult@patria.com"]');
+    const menu = onClick('[data-test-id="rafael.porto.consult@patria.com-menu-dots"]');
+    const other = onClick('[data-test-id="rafael.moura@climbee.com"]');
+
+    expect(advance(ctx)).toBe(true);
+    expect(tile).toHaveBeenCalledOnce();
+    expect(menu).not.toHaveBeenCalled();
+    expect(other).not.toHaveBeenCalled();
+  });
+
+  it("leaves the choice to the user with several accounts and no preferred account", () => {
+    const ctx = page(chooser);
+    expect(advance(ctx)).toBe(false);
+  });
+
+  it("ignores test IDs that are not emails", () => {
+    const ctx = page('<div role="button" data-test-id="otherTile">Use outra conta</div>');
+    expect(advance(ctx)).toBe(false);
+  });
+});
+
 describe("consent screen", () => {
   it("ticks Select all before clicking Continue", () => {
     const ctx = page(`
