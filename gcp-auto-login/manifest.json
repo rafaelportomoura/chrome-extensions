@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "gcloud Auto Login",
+  "version": "1.0.0",
+  "description": "Auto-clicks the Google sign-in buttons for `gcloud auth login` and `gcloud auth application-default login`.",
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://accounts.google.com/*"],
+      "js": ["shared.js", "content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://cloud.google.com/sdk/auth_success*"],
+      "js": ["shared.js", "success.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "gcloud Auto Login",
+    "default_popup": "options.html"
+  }
+}
