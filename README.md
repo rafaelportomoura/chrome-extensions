@@ -5,8 +5,8 @@ locally with Chrome's "Load unpacked"; none is published to the Chrome Web Store
 
 ## Extensions
 
-| Folder | Name | What it does |
-| --- | --- | --- |
+| Folder                                        | Name              | What it does                                                                                                       |
+| --------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [`exts/gcp-auto-login`](exts/gcp-auto-login/) | gcloud Auto Login | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`. |
 
 Each extension folder has its own `README.md` (how it works, settings, limitations) and
@@ -14,19 +14,33 @@ Each extension folder has its own `README.md` (how it works, settings, limitatio
 
 ## Install
 
+Requires Node 24+ and pnpm.
+
+```sh
+pnpm install
+pnpm build
+```
+
 1. Open `chrome://extensions` and turn on **Developer mode**.
-2. Click **Load unpacked** and pick the extension folder: `exts/<extension>/dist` for TypeScript
-   extensions, or `exts/<extension>` for legacy ones (no `dist/`).
-3. After pulling changes, click the reload icon on the extension's card.
+2. Click **Load unpacked** and pick `exts/<extension>/dist`.
+3. After pulling changes, run `pnpm build` again and click the reload icon on the extension's card.
+
+## Develop
+
+```sh
+pnpm --filter <extension> dev   # rebuild on every change
+pnpm check                      # lint, typecheck and unit tests
+pnpm format                     # apply Biome fixes
+```
 
 ## Share
 
 ```sh
-scripts/zip.sh <extension>
+pnpm zip <extension>
 ```
 
-This writes `~/Downloads/<extension>-<version>.zip`, with the version read from the extension's
-`manifest.json`. Whoever receives it unzips it and loads the folder with **Load unpacked**.
+This builds the extension and writes `~/Downloads/<extension>-<version>.zip`, with the version
+read from the extension's `manifest.json`. Whoever receives it unzips it and loads the folder with **Load unpacked**.
 
 ## Contributing
 

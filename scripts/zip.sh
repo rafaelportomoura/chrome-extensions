@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Packages one extension into ~/Downloads/<extension>-<version>.zip for sharing.
-# Zips exts/<extension>/dist when it exists (TypeScript extensions), otherwise the
-# extension folder itself (legacy extensions). Overwrites an existing zip.
+# Builds and zips exts/<extension>/dist for TypeScript extensions; zips the extension
+# folder itself for legacy ones (no package.json). Overwrites an existing zip.
 set -euo pipefail
 
 usage() {
@@ -19,7 +19,8 @@ EXTENSION="${1%/}"
 EXTENSION_DIR="$EXTS_DIR/$EXTENSION"
 [[ -d "$EXTENSION_DIR" ]] || { echo "Extension not found: $EXTENSION_DIR" >&2; usage; }
 
-if [[ -d "$EXTENSION_DIR/dist" ]]; then
+if [[ -f "$EXTENSION_DIR/package.json" ]]; then
+  pnpm --dir "$REPO_ROOT" --filter "$EXTENSION" build
   SOURCE_DIR="$EXTENSION_DIR/dist"
 else
   SOURCE_DIR="$EXTENSION_DIR"

@@ -1,0 +1,4 @@
+packages:
+  - exts/*
+allowBuilds:
+  esbuild: true

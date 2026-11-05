@@ -5,8 +5,20 @@ Clicks through the Google sign-in pages that `gcloud auth login` and
 "Select all" scopes checkbox and the Continue / Allow buttons. On the success page it closes the
 tab.
 
-Legacy extension: plain JavaScript, no build, no tests. Load this folder directly with
+Built with `pnpm --filter gcp-auto-login build`; load `exts/gcp-auto-login/dist` with
 **Load unpacked**.
+
+## Code map
+
+| File                                       | Role                                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `src/content.ts`                           | Entry on `accounts.google.com`: checks the flow, then drives the page on every DOM change. |
+| `src/sign-in-page.ts`                      | Picks the account, ticks "Select all", clicks Continue / Allow.                            |
+| `src/url.ts`                               | Finds an allowed client ID in the (multiply encoded) page URL.                             |
+| `src/background.ts`, `src/flow-tracker.ts` | Background worker that remembers which tabs have an active flow.                           |
+| `src/success.ts`                           | Entry on the success page: ends the flow and closes the tab.                               |
+| `src/options.ts`, `static/options.html`    | Settings page, also used as the toolbar popup.                                             |
+| `src/settings.ts`                          | Settings shape, defaults and storage.                                                      |
 
 ## How it works
 
@@ -25,12 +37,12 @@ Every action is logged to the page console with the `[gcloud-auto-login]` prefix
 
 Open them from the toolbar icon or the extension's options page. They sync across browsers.
 
-| Setting | Default | Effect |
-| --- | --- | --- |
-| Enabled | on | Turns the whole extension on or off. |
-| Close the success tab | on | Closes the tab on the success page. |
-| Preferred account | empty | Email to pick on the account chooser. Empty: pick only when the chooser shows a single account. |
-| Allowed OAuth client IDs | gcloud's two client IDs | Sign-ins the extension may complete. |
+| Setting                  | Default                 | Effect                                                                                          |
+| ------------------------ | ----------------------- | ----------------------------------------------------------------------------------------------- |
+| Enabled                  | on                      | Turns the whole extension on or off.                                                            |
+| Close the success tab    | on                      | Closes the tab on the success page.                                                             |
+| Preferred account        | empty                   | Email to pick on the account chooser. Empty: pick only when the chooser shows a single account. |
+| Allowed OAuth client IDs | gcloud's two client IDs | Sign-ins the extension may complete.                                                            |
 
 Default allowed client IDs:
 

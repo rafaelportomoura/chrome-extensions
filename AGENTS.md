@@ -15,22 +15,29 @@ in code, docs and commits.
 
 ## Standard stack
 
-The target for every extension. The tooling does not exist in the repo yet: the first extension
-that adopts it scaffolds it at the root.
+Every extension follows it; `exts/gcp-auto-login` is the reference to copy when adding one.
 
 - TypeScript in strict mode, Manifest V3.
-- pnpm workspaces, one package per `exts/*` folder.
-- esbuild bundles each extension into `exts/<extension>/dist/` (git-ignored); `dist/` is what
-  gets loaded unpacked and zipped.
-- Vitest unit tests (jsdom, `chrome.*` mocked) for every behaviour change.
+- pnpm workspaces, one package per `exts/*` folder. Root config: `tsconfig.base.json`,
+  `biome.json`; build-time dependencies live in each extension's own `package.json`.
+- Each extension keeps entry points and modules in `src/`, files copied verbatim (manifest, HTML)
+  in `static/`, and a `build.ts` that bundles every entry point with esbuild as a standalone IIFE
+  into `dist/` (git-ignored). `dist/` is what gets loaded unpacked and zipped.
+- Entry points stay thin wiring; logic lives in modules that take their inputs as arguments so
+  the unit tests reach it without a browser.
+- Vitest unit tests in `tests/` (jsdom, `chrome.*` replaced by an in-memory mock) for every
+  behaviour change.
 - Playwright end-to-end tests, loading the real extension, where an extension needs them.
-- Biome for lint and format, one config at the root.
+- Biome for lint and format.
+
+Root scripts: `pnpm check` runs lint, typecheck and tests across all extensions;
+`pnpm format` applies Biome's fixes; `pnpm --filter <extension> dev` rebuilds on change.
 
 ## Legacy extensions
 
-`exts/gcp-auto-login` is legacy: plain JavaScript, no build, no tests, loaded straight from its
-folder. Small fixes stay in plain JavaScript. A substantial change migrates the extension to the
-standard stack first, in its own commit.
+A legacy extension is plain JavaScript loaded straight from its folder, with no `package.json`.
+None remain. Should one be added, small fixes stay in plain JavaScript and a substantial change
+migrates it to the standard stack first, in its own commit.
 
 ## Security
 
@@ -43,7 +50,7 @@ standard stack first, in its own commit.
 
 ## Verification
 
-1. Run the unit tests (standard extensions).
+1. Run `pnpm check` and `pnpm build`.
 2. Reload the extension at `chrome://extensions`.
 3. Reproduce the flow the change touches in a real browser.
 4. Read the extension's console logs, filtered by its log prefix (e.g. `[gcloud-auto-login]`), in
@@ -64,5 +71,5 @@ A change is verified when the flow behaves as intended and the logs show no erro
 
 ## Sharing
 
-`scripts/zip.sh <extension>` writes `~/Downloads/<extension>-<version>.zip`, packaging `dist/`
-when it exists and the extension folder otherwise.
+`pnpm zip <extension>` builds the extension and writes `~/Downloads/<extension>-<version>.zip`
+from its `dist/` (a legacy extension is zipped from its folder).
