@@ -64,7 +64,7 @@ A change is verified when the flow behaves as intended and the logs show no erro
   so the work never needs a branch, worktree or pull request.
 - Git hooks in `.githooks/` (enabled by `pnpm install`) gate every commit and push:
   - pre-commit: `pnpm audit` at moderate level, `pnpm lint`, `pnpm format:check`;
-  - pre-push: `pnpm audit` at moderate level, `pnpm lint`, `pnpm test`.
+  - pre-push: `pnpm test`.
 
   A red hook means fixing the cause, then retrying: `pnpm format` for formatting, upgrading or
   overriding the dependency for a moderate or worse advisory.

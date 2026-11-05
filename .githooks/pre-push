@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-# Blocks the push when dependencies carry a moderate-or-worse advisory, lint fails or a test fails.
+# Blocks the push when a unit test fails. Audit, lint and formatting already ran at pre-commit.
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
-echo "pre-push: audit"
-pnpm audit --audit-level moderate
-echo "pre-push: lint"
-pnpm lint
 echo "pre-push: test"
 pnpm test
