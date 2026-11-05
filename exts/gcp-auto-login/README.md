@@ -27,7 +27,7 @@ Built with `pnpm --filter gcp-auto-login build`; load `exts/gcp-auto-login/dist`
 2. Later pages of the same sign-in do not always carry the client ID, so they act only while the
    tab's flow is active (5 minutes from the last marked page). This includes
    `login.microsoftonline.com`, where a Google Workspace account federated to Microsoft Entra ID
-   lands for SSO: there the extension only picks the preferred account on the chooser.
+   lands for SSO: the same steps below apply there.
 3. On each page it picks the preferred account, ticks "Select all" for the requested scopes, and
    clicks Continue / Allow. Labels are matched in English and Portuguese. It stops after
    60 seconds on a page.
