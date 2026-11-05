@@ -9,9 +9,11 @@ in code, docs and commits.
 - Every extension is one self-contained folder under `exts/`, named in kebab-case. The repo root
   is reserved for repo-wide tooling and docs.
 - Extensions share no code with each other; anything common is copied, not imported.
-- Each extension folder carries a `README.md` (how it works, settings, limitations) and a
-  `GLOSSARY.md`. Update both, and the extensions table in the root `README.md`, when an extension
-  is added or its behaviour changes.
+- Each extension folder carries a `README.md` (how it works, settings, limitations), a
+  `GLOSSARY.md` and a `DESCRIPTION.md`, plus an `INSTALL.md` when installing it takes steps of
+  its own (see Sharing). Update them, and the extensions table in the root `README.md`, when an
+  extension is added or its behaviour changes.
+- `scripts/` is a workspace package for repo tooling, tested like an extension.
 
 ## Standard stack
 
@@ -77,5 +79,26 @@ A change is verified when the flow behaves as intended and the logs show no erro
 
 ## Sharing
 
-`pnpm zip <extension>` builds the extension and writes `~/Downloads/<extension>-<version>.zip`
-from its `dist/` (a legacy extension is zipped from its folder).
+`pnpm zip <extension> [--lang pt-BR|en]` (default `pt-BR`) builds the extension, writes
+`~/Downloads/<extension>-<version>.zip` from its `dist/` plus a filled-in `INSTALL.md`, and prints
+a chat message it also copies to the clipboard.
+
+Sources, each with one `## pt-BR` and one `## en` section (`pnpm zip` fails on a missing one):
+
+- `INSTALL.md` (root): the generic install guide. Placeholders `{{name}}`, `{{version}}`,
+  `{{folder}}`, `{{zip}}`, `{{extension_steps}}`.
+- `scripts/MESSAGE.md`: the chat message. Same placeholders, plus `{{description}}`.
+- `exts/<extension>/DESCRIPTION.md` (required): what the extension is, fed into the message.
+- `exts/<extension>/INSTALL.md` (optional): extension-specific steps, fed into
+  `{{extension_steps}}`.
+
+Inside a section, headings are `#` or `###`; `##` starts the next locale.
+
+These are pasted into Slack and Teams, so write them plainly and objectively:
+
+- Plain text: no bold, italics or links, only line breaks and `- ` lists, which render cleanly in
+  both.
+- `DESCRIPTION.md`, per locale: one sentence on what the extension does, one on when it helps,
+  at most three `- ` items; about 60 words in all.
+- Extension `INSTALL.md`: short numbered steps under `###` headings.
+- The `pt-BR` sections are the one place Portuguese belongs in the repo: they are end-user text.

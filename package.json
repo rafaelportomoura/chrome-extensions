@@ -12,7 +12,7 @@
     "format": "biome check --write .",
     "format:check": "biome check --linter-enabled=false .",
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
-    "zip": "scripts/zip.sh"
+    "zip": "node scripts/src/zip.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.5"

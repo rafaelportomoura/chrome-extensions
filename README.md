@@ -9,8 +9,8 @@ locally with Chrome's "Load unpacked"; none is published to the Chrome Web Store
 | --------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [`exts/gcp-auto-login`](exts/gcp-auto-login/) | gcloud Auto Login | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`. |
 
-Each extension folder has its own `README.md` (how it works, settings, limitations) and
-`GLOSSARY.md`.
+Each extension folder has its own `README.md` (how it works, settings, limitations),
+`GLOSSARY.md` and `DESCRIPTION.md` (what it is, for sharing).
 
 ## Install
 
@@ -36,11 +36,13 @@ pnpm format                     # apply Biome formatting and safe fixes
 ## Share
 
 ```sh
-pnpm zip <extension>
+pnpm zip <extension>             # Portuguese
+pnpm zip <extension> --lang en   # English
 ```
 
-This builds the extension and writes `~/Downloads/<extension>-<version>.zip`, with the version
-read from the extension's `manifest.json`. Whoever receives it unzips it and loads the folder with **Load unpacked**.
+This builds the extension and writes `~/Downloads/<extension>-<version>.zip` with an
+`INSTALL.md` in the chosen language inside. It also prints a chat message describing the
+extension and copies it to the clipboard: paste it in Slack or Teams and attach the zip.
 
 ## Contributing
 

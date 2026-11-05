@@ -1,4 +1,5 @@
 packages:
   - exts/*
+  - scripts
 allowBuilds:
   esbuild: true
