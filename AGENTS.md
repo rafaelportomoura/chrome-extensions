@@ -53,6 +53,10 @@ A change is verified when the flow behaves as intended and the logs show no erro
 
 ## Commits and versions
 
+- Commit and push straight to `main`. This is a personal repo with one agent working at a time,
+  so the work never needs a branch, worktree or pull request.
+- Commit and push every finished change without asking first. A change the user rejects is
+  undone with a follow-up revert commit.
 - Conventional Commits, scoped by the extension folder name: `feat(gcp-auto-login): ...`.
   Repo-wide changes use no scope.
 - Bump `version` in the extension's `manifest.json` (semver) in any commit that changes its
