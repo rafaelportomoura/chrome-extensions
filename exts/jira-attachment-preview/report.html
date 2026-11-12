@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Attachment Preview for Jira mostra HTML e Markdown renderizados</title>
+<title>Attachment Preview for Jira renders HTML, Markdown and Excalidraw</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
@@ -371,112 +371,113 @@ dl.kv dd { margin: 0; }
 </head>
 <body>
 <main class="page"><article class="reading">
-<button class="width-toggle" type="button" aria-pressed="false" title="Alternar largura do relatório" data-fluid="Largura 50%" data-fixed="Largura 960 px"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">Largura 50%</span></button>
+<button class="width-toggle" type="button" aria-pressed="false" title="Toggle report width" data-fluid="Width 50%" data-fixed="Width 960 px"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">Width 50%</span></button>
 <!-- report-html:content -->
 <header>
 <p class="eyebrow">Free · chrome-extensions · 12 nov 2026</p>
-<h1>Attachment Preview for Jira mostra HTML e Markdown renderizados</h1>
-<div class="meta"><span class="status positive">Implementada, falta validar no Jira real</span><span>v1.0.0 · Manifest V3</span><code>exts/jira-attachment-preview</code></div>
+<h1>Attachment Preview for Jira renders HTML, Markdown and Excalidraw</h1>
+<div class="meta"><span class="status positive">Implemented, not yet checked on real Jira</span><span>v1.2.0 · Manifest V3</span><code>exts/jira-attachment-preview</code></div>
 </header>
-<div class="summary"><p>Extensão do Chrome que renderiza anexos HTML e Markdown no visualizador de anexos do Jira Cloud, que mostra só o código. Os 84 testes unitários passam, e o e2e no Chromium do Playwright passou de novo. Falta validar numa página real do Jira Cloud.</p></div>
+<div class="summary"><p>A Chrome extension that renders HTML, Markdown and Excalidraw attachments in the Jira Cloud attachment viewer, which shows only source code. Version 1.2.0 adds Excalidraw Previews on a pannable, zoomable Canvas. All 150 unit tests pass; a check on a real Jira Cloud page is still pending.</p></div>
 <ul class="key-points">
-<li>Preview substitui o Source; um botão alterna.</li>
-<li>HTML roda em sandbox de origem opaca, sem acesso à página nem aos cookies.</li>
-<li>Markdown tem tabelas, código colorido e Mermaid, tudo empacotado.</li>
-<li>Aceita até 5 MB e abre o preview em nova aba.</li>
-</ul>
-<ul class="key-points attention">
-<li>Não verificado com a extensão carregada numa página real do Jira Cloud.</li>
+<li>The Preview replaces the Source view; a button toggles between them.</li>
+<li>HTML runs in an opaque-origin sandbox, without the page or cookies.</li>
+<li>Markdown has tables, highlighted code, Mermaid and front matter.</li>
+<li>Excalidraw drawings open on a Canvas that pans and zooms.</li>
 </ul>
 
-<section class="section"><h2>Para quem é e o que faz</h2>
-<p>Serve a quem revisa protótipos HTML e Markdown anexados a cards, sem baixar. Atua em arquivos <code>.html</code>, <code>.htm</code>, <code>.md</code> e <code>.markdown</code>; outros arquivos ficam como estão.</p>
+<section class="section"><h2>Who it is for and what it does</h2>
+<p>For reviewing attachments without downloading them. It acts on <code>.html</code>, <code>.htm</code>, <code>.md</code>, <code>.markdown</code>, <code>.excalidraw</code> and <code>.excalidraw.json</code>; other files stay as they are.</p>
 </section>
 
-<section class="section"><h2>Como o conteúdo chega ao preview</h2>
+<section class="section"><h2>How the content reaches the Preview</h2>
 <figure class="diagram">
-<svg viewBox="0 0 880 394" role="img" aria-label="Fluxo: do visualizador Jira ao preview">
-<defs><marker id="m84fb49" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
-<g transform="translate(7 0)">
-<path class="edge" d="M152 182 H247" marker-end="url(#m84fb49)"/>
-<text class="edge-label" x="200" y="176" text-anchor="middle">anexo abre</text>
-<path class="edge" d="M383 163 H421 V50 H479" marker-end="url(#m84fb49)"/>
-<text class="edge-label" x="421" y="106" text-anchor="middle">texto</text>
-<path class="edge dashed" d="M383 176 H428 V138 H490" marker-end="url(#m84fb49)"/>
-<text class="edge-label" x="428" y="157" text-anchor="middle">sem editor</text>
-<path class="edge primary" d="M383 188 H435 V226 H490" marker-end="url(#m84fb49)"/>
-<text class="edge-label" x="435" y="207" text-anchor="middle">render</text>
-<path class="edge" d="M383 201 H442 V314 H490" marker-end="url(#m84fb49)"/>
-<text class="edge-label" x="442" y="258" text-anchor="middle">open-tab</text>
-<path class="edge" d="M618 314 H660 V182 H713" marker-end="url(#m84fb49)"/>
-<text class="edge-label" x="660" y="248" text-anchor="middle">snapshot</text>
+<svg viewBox="0 0 893 482" role="img" aria-label="Flow: from the Jira attachment viewer to the Preview">
+<defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="edge" d="M182 226 H277" marker-end="url(#f)"/>
+<text class="edge-label" x="230" y="220" text-anchor="middle">file opens</text>
+<path class="edge" d="M413 207 H444 V50 H516" marker-end="url(#f)"/>
+<text class="edge-label" x="444" y="128" text-anchor="middle">text</text>
+<path class="edge dashed" d="M413 216 H451 V138 H516" marker-end="url(#f)"/>
+<text class="edge-label" x="451" y="177" text-anchor="middle">no editor</text>
+<path class="edge" d="M413 226 H516" marker-end="url(#f)"/>
+<text class="edge-label" x="465" y="220" text-anchor="middle">render</text>
+<path class="edge primary" d="M413 236 H465 V314 H503" marker-end="url(#f)"/>
+<text class="edge-label" x="465" y="275" text-anchor="middle">render</text>
+<path class="edge" d="M413 245 H472 V402 H516" marker-end="url(#f)"/>
+<text class="edge-label" x="472" y="324" text-anchor="middle">open-tab</text>
+<path class="edge" d="M644 402 H686 V226 H741" marker-end="url(#f)"/>
+<text class="edge-label" x="686" y="314" text-anchor="middle">snapshot</text>
 <g class="node muted">
-<rect x="24" y="156" width="128" height="52" rx="6"/>
-<text class="title" x="38" y="180">Visualizador</text>
-<text class="sub" x="38" y="198">Jira Cloud</text></g>
+<rect x="24" y="200" width="158" height="52" rx="6"/>
+<text class="title" x="38" y="224">Attachment viewer</text>
+<text class="sub" x="38" y="242">Jira Cloud</text></g>
 <g class="node primary" data-detail="content" aria-label="Content script: ver detalhe">
-<rect x="247" y="156" width="136" height="52" rx="6"/>
-<text class="title" x="261" y="180">Content script</text>
-<text class="sub" x="261" y="198">isolated world</text></g>
-<g class="node" data-detail="editor" aria-label="Leitor do editor: ver detalhe">
-<rect x="479" y="24" width="151" height="52" rx="6"/>
-<text class="title" x="493" y="48">Leitor do editor</text>
-<text class="sub" x="493" y="66">page world</text></g>
-<g class="node" data-detail="rest" aria-label="REST Jira: ver detalhe">
-<rect x="490" y="112" width="128" height="52" rx="6"/>
-<text class="title" x="504" y="136">REST Jira</text>
-<text class="sub" x="504" y="154">fallback</text></g>
+<rect x="277" y="200" width="136" height="52" rx="6"/>
+<text class="title" x="291" y="224">Content script</text>
+<text class="sub" x="291" y="242">isolated world</text></g>
+<g class="node" data-detail="editor" aria-label="Editor reader: ver detalhe">
+<rect x="516" y="24" width="128" height="52" rx="6"/>
+<text class="title" x="530" y="48">Editor reader</text>
+<text class="sub" x="530" y="66">page world</text></g>
+<g class="node" data-detail="rest" aria-label="Jira REST: ver detalhe">
+<rect x="516" y="112" width="128" height="52" rx="6"/>
+<text class="title" x="530" y="136">Jira REST</text>
+<text class="sub" x="530" y="154">fallback</text></g>
 <g class="node" data-detail="preview" aria-label="preview.html: ver detalhe">
-<rect x="490" y="200" width="128" height="52" rx="6"/>
-<text class="title" x="504" y="224">preview.html</text>
-<text class="sub" x="504" y="242">sandbox</text></g>
+<rect x="516" y="200" width="128" height="52" rx="6"/>
+<text class="title" x="530" y="224">preview.html</text>
+<text class="sub" x="530" y="242">HTML, Markdown</text></g>
+<g class="node" data-detail="excal" aria-label="excalidraw.html: ver detalhe">
+<rect x="503" y="288" width="155" height="52" rx="6"/>
+<text class="title" x="517" y="312">excalidraw.html</text>
+<text class="sub" x="517" y="330">drawings · new in 1.2</text></g>
 <g class="node" data-detail="bg" aria-label="Background: ver detalhe">
-<rect x="490" y="288" width="128" height="52" rx="6"/>
-<text class="title" x="504" y="312">Background</text>
-<text class="sub" x="504" y="330">service worker</text></g>
-<g class="node" data-detail="tab" aria-label="Nova aba: ver detalhe">
-<rect x="713" y="156" width="128" height="52" rx="6"/>
-<text class="title" x="727" y="180">Nova aba</text>
-<text class="sub" x="727" y="198">tab.html</text></g>
-</g>
+<rect x="516" y="376" width="128" height="52" rx="6"/>
+<text class="title" x="530" y="400">Background</text>
+<text class="sub" x="530" y="418">service worker</text></g>
+<g class="node" data-detail="tab" aria-label="New tab: ver detalhe">
+<rect x="741" y="200" width="128" height="52" rx="6"/>
+<text class="title" x="755" y="224">New tab</text>
+<text class="sub" x="755" y="242">tab.html</text></g>
 </svg>
-<figcaption>Clique em um bloco para ver o detalhe.</figcaption>
+<figcaption>Click a block for its detail.</figcaption>
 </figure>
-
-
-<div class="accordion"><details><summary>Sequência completa das mensagens</summary><div class="body"><figure class="diagram">
-<svg viewBox="0 0 920 604" role="img" aria-label="Sequência: abrir um anexo e ver o preview">
-<defs><marker id="m5198d0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
-<path class="edge dashed" d="M84 50 V594" stroke-opacity="0.6"/>
-<path class="edge dashed" d="M234 50 V594" stroke-opacity="0.6"/>
-<path class="edge dashed" d="M385 50 V594" stroke-opacity="0.6"/>
-<path class="edge dashed" d="M535 50 V594" stroke-opacity="0.6"/>
-<path class="edge dashed" d="M686 50 V594" stroke-opacity="0.6"/>
-<path class="edge dashed" d="M836 50 V594" stroke-opacity="0.6"/>
-<path class="edge" d="M84 102 H234" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="159" y="95" text-anchor="middle">arquivo .html ou .md</text>
-<path class="edge" d="M234 146 H385" marker-end="url(#m5198d0)"/>
+<div class="accordion"><details><summary>Full message sequence</summary><div class="body">
+<figure class="diagram">
+<svg viewBox="0 0 920 644" role="img" aria-label="Sequence: open an attachment and see its Preview">
+<defs><marker id="s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="edge dashed" d="M84 50 V634" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M234 50 V634" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M385 50 V634" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M535 50 V634" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M686 50 V634" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M836 50 V634" stroke-opacity="0.6"/>
+<path class="edge" d="M84 102 H234" marker-end="url(#s)"/>
+<text class="edge-label" x="159" y="95" text-anchor="middle">supported file</text>
+<path class="edge" d="M234 146 H385" marker-end="url(#s)"/>
 <text class="edge-label" x="310" y="139" text-anchor="middle">editor-request</text>
-<path class="edge dashed" d="M385 190 H234" marker-end="url(#m5198d0)"/>
+<path class="edge dashed" d="M385 190 H234" marker-end="url(#s)"/>
 <text class="edge-label" x="310" y="183" text-anchor="middle">editor-response</text>
-<g class="node muted"><rect x="164" y="218" width="441" height="30" rx="6"/><text class="sub" x="385" y="237" text-anchor="middle">Sem editor, sem texto ou com tamanho diferente do exibido: REST</text></g>
-<path class="edge" d="M234 274 H535" marker-end="url(#m5198d0)"/>
+<g class="node muted"><rect x="164" y="218" width="441" height="30" rx="6"/><text class="sub" x="385" y="237" text-anchor="middle">No editor, no text or a different size: REST</text></g>
+<path class="edge" d="M234 274 H535" marker-end="url(#s)"/>
 <text class="edge-label" x="385" y="267" text-anchor="middle">GET issue, GET content</text>
-<path class="edge dashed" d="M535 318 H234" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="385" y="311" text-anchor="middle">texto</text>
-<path class="edge" d="M234 362 H686" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="460" y="355" text-anchor="middle">abre o iframe</text>
-<path class="edge dashed" d="M686 406 H234" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="460" y="399" text-anchor="middle">ready</text>
-<path class="edge" d="M234 450 H686" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="460" y="443" text-anchor="middle">render</text>
-<path class="edge" d="M234 494 H836" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="535" y="487" text-anchor="middle">open-tab</text>
-<path class="edge" d="M836 538 H882 V558 H839" marker-end="url(#m5198d0)"/>
-<text class="edge-label" x="959" y="552" text-anchor="middle">grava snapshot, abre aba</text>
+<path class="edge dashed" d="M535 318 H234" marker-end="url(#s)"/>
+<text class="edge-label" x="385" y="311" text-anchor="middle">text</text>
+<g class="node muted"><rect x="164" y="346" width="591" height="30" rx="6"/><text class="sub" x="460" y="365" text-anchor="middle">Excalidraw: an invalid scene keeps the Source view</text></g>
+<path class="edge" d="M234 402 H686" marker-end="url(#s)"/>
+<text class="edge-label" x="460" y="395" text-anchor="middle">frames the page</text>
+<path class="edge dashed" d="M686 446 H234" marker-end="url(#s)"/>
+<text class="edge-label" x="460" y="439" text-anchor="middle">ready</text>
+<path class="edge" d="M234 490 H686" marker-end="url(#s)"/>
+<text class="edge-label" x="460" y="483" text-anchor="middle">render</text>
+<path class="edge" d="M234 534 H836" marker-end="url(#s)"/>
+<text class="edge-label" x="535" y="527" text-anchor="middle">open-tab</text>
+<path class="edge" d="M836 578 H882 V598 H839" marker-end="url(#s)"/>
+<text class="edge-label" x="933" y="592" text-anchor="middle">stores snapshot</text>
 <g class="node">
 <rect x="20" y="10" width="128" height="40" rx="6"/>
-<text class="title" x="34" y="34">Visualizador</text></g>
+<text class="title" x="34" y="34">Viewer</text></g>
 <g class="node">
 <rect x="170" y="10" width="128" height="40" rx="6"/>
 <text class="title" x="184" y="34">Content script</text></g>
@@ -485,91 +486,125 @@ dl.kv dd { margin: 0; }
 <text class="title" x="335" y="34">Page world</text></g>
 <g class="node">
 <rect x="471" y="10" width="128" height="40" rx="6"/>
-<text class="title" x="485" y="34">REST Jira</text></g>
+<text class="title" x="485" y="34">Jira REST</text></g>
 <g class="node">
 <rect x="622" y="10" width="128" height="40" rx="6"/>
-<text class="title" x="636" y="34">preview.html</text></g>
+<text class="title" x="636" y="34">Sandbox page</text></g>
 <g class="node">
 <rect x="772" y="10" width="128" height="40" rx="6"/>
 <text class="title" x="786" y="34">Background</text></g>
 </svg>
-<figcaption>Clique em um bloco para ver o detalhe.</figcaption>
+<figcaption>Messages in time order.</figcaption>
 </figure>
-</div></details></div>
-<div class="accordion"><details><summary>Editor com o texto do arquivo anterior</summary><div class="body"><ul><li>Após trocar de arquivo, o Jira pode manter o editor antigo. Se o texto lido é o do arquivo anterior, o controlador lê de novo, até 6 vezes a cada 250 ms.</li><li>Persistindo o texto antigo, usa o REST.</li><li>Se o REST falha e o texto só estava "sem mudança", usa esse texto: dois anexos podem ter o mesmo conteúdo.</li><li>Mostrar o mesmo arquivo de novo reaproveita o texto do editor.</li><li>Tamanho diferente do exibido também envia ao REST.</li></ul></div></details></div></section>
 
-<section class="section"><h2>Quatro estados: carregando, preview, source, erro</h2>
+</div></details></div>
+<div class="accordion"><details><summary>Editor still holding the previous file</summary><div class="body"><ul><li>After a file switch, Jira may keep the old editor. If the text read is the previous file's, the controller reads again, up to 6 times every 250 ms.</li><li>If the old text persists, it uses REST.</li><li>If REST fails and the text was only "unchanged", it uses that text: two attachments can share content.</li><li>Showing the same file again reuses the editor text.</li><li>A size more than one unit off the displayed size also goes to REST.</li></ul></div></details></div></section>
+
+<section class="section"><h2>Excalidraw drawings open on a Canvas</h2>
 <figure class="diagram">
-<svg viewBox="0 0 880 194" role="img" aria-label="Estados do preview">
-<defs><marker id="mfcc766" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
-<g transform="translate(142 0)">
-<path class="edge" d="M152 37 H190 V75 H236" marker-end="url(#mfcc766)"/>
-<text class="edge-label" x="190" y="56" text-anchor="middle">carregou</text>
-<path class="edge" d="M88 64 V100" marker-end="url(#mfcc766)"/>
-<text class="edge-label" x="112" y="82" text-anchor="middle">falhou</text>
-<path class="edge" d="M364 82 H444" marker-end="url(#mfcc766)"/>
-<text class="edge-label" x="404" y="76" text-anchor="middle">Source</text>
-<path class="edge dashed" d="M516 102 V162 H292 V102" marker-end="url(#mfcc766)"/>
-<text class="edge-label" x="404" y="156" text-anchor="middle">Preview</text>
-<g class="node">
-<rect x="24" y="24" width="128" height="40" rx="6"/>
-<text class="title" x="38" y="48">Carregando</text></g>
-<g class="node primary">
-<rect x="236" y="62" width="128" height="40" rx="6"/>
-<text class="title" x="250" y="86">Preview</text></g>
-<g class="node">
-<rect x="444" y="62" width="128" height="40" rx="6"/>
-<text class="title" x="458" y="86">Source</text></g>
-<g class="node attention">
-<rect x="24" y="100" width="128" height="40" rx="6"/>
-<text class="title" x="38" y="124">Erro</text></g>
+<svg viewBox="0 0 880 130" role="img" aria-label="Excalidraw Preview: from the render message to the Canvas">
+<defs><marker id="x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<g transform="translate(22 0)">
+<path class="edge" d="M160 50 H249" marker-end="url(#x)"/>
+<text class="edge-label" x="205" y="44" text-anchor="middle">JSON text</text>
+<path class="edge" d="M392 50 H472" marker-end="url(#x)"/>
+<text class="edge-label" x="432" y="44" text-anchor="middle">scene</text>
+<path class="edge primary" d="M603 50 H683" marker-end="url(#x)"/>
+<text class="edge-label" x="643" y="44" text-anchor="middle">SVG</text>
+<g class="node muted">
+<rect x="24" y="24" width="136" height="52" rx="6"/>
+<text class="title" x="38" y="48">render message</text>
+<text class="sub" x="38" y="66">kind excalidraw</text></g>
+<g class="node" data-detail="scene" aria-label="parseScene: ver detalhe">
+<rect x="249" y="24" width="143" height="52" rx="6"/>
+<text class="title" x="263" y="48">parseScene</text>
+<text class="sub" x="263" y="66">excalidraw-scene.ts</text></g>
+<g class="node" data-detail="export" aria-label="exportScene: ver detalhe">
+<rect x="472" y="24" width="131" height="52" rx="6"/>
+<text class="title" x="486" y="48">exportScene</text>
+<text class="sub" x="486" y="66">@excalidraw/utils</text></g>
+<g class="node primary" data-detail="canvas" aria-label="Canvas: ver detalhe">
+<rect x="683" y="24" width="128" height="52" rx="6"/>
+<text class="title" x="697" y="48">Canvas</text>
+<text class="sub" x="697" y="66">canvas.ts</text></g>
 </g>
 </svg>
-<figcaption>Estados mostrados ao lado do botão de download.</figcaption>
+<figcaption>Click a block for its detail.</figcaption>
 </figure>
+<p>Opens zoomed to fit; wheel or drag pans, Ctrl/⌘ + wheel or pinch zooms. It follows Jira's theme and makes no network request.</p>
+<div class="accordion"><details><summary>Canvas rules in detail</summary><div class="body"><ul><li>Opens fitted with a 32 px margin; an empty drawing opens at 100%.</li><li>Ctrl/⌘ + wheel or pinch zooms around the pointer; primary-button drag pans.</li><li>Bottom-left control: −, the zoom (click for 100%), + and Fit.</li><li>Fonts are bundled, so drawing makes no network request.</li><li>Zoom limits are Excalidraw's: 10% (<code>MIN_ZOOM</code>) to 3000% (<code>MAX_ZOOM</code>).</li><li>+ and − step to the next tenth; one wheel event zooms at most 10%.</li><li>Line and page wheel deltas are read as pixels (16 px per line).</li><li>The SVG is resized rather than CSS-scaled, so it stays sharp at any zoom.</li><li>On resize, a drawing the user has not moved keeps its opening view; Fit restores it.</li><li>Dark theme uses Excalidraw's dark mode; light uses the file's background, white when none is set.</li><li>Embedded images are inline in the file and drawn with it.</li></ul></div></details></div>
+<div class="accordion"><details><summary>Invalid files</summary><div class="body"><p>The content script runs <code>parseScene</code> before framing. Text that is not JSON with <code>"type": "excalidraw"</code> and an <code>elements</code> array keeps the Source view, with "not a valid Excalidraw file" next to the download button. An export failure inside the page shows "Excalidraw: &lt;message&gt;" and logs it.</p></div></details></div></section>
 
-<p>No erro, o Source do Jira continua visível e o motivo aparece ao lado do botão de download.</p><div class="accordion"><details><summary>Motivos de erro</summary><div class="body"><ul><li>file larger than 5 MB</li><li>issue not found</li><li>attachment not found</li><li><code>Jira returned &lt;status&gt;</code></li><li>could not load the file</li></ul></div></details></div></section>
-
-<section class="section"><h2>Contratos: manifesto, mensagens e dois GETs</h2>
-<div class="toolbar"><button class="btn" type="button" data-toggle-all="#contracts" data-label-open="Abrir tudo" data-label-close="Fechar tudo"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">Abrir tudo</span></button></div>
+<section class="section"><h2>Four states: loading, Preview, Source, error</h2>
+<figure class="diagram">
+<svg viewBox="0 0 880 194" role="img" aria-label="Preview states">
+<defs><marker id="st" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<g transform="translate(144 0)">
+<path class="edge" d="M152 37 H188 V75 H232" marker-end="url(#st)"/>
+<text class="edge-label" x="188" y="56" text-anchor="middle">loaded</text>
+<path class="edge" d="M88 64 V100" marker-end="url(#st)"/>
+<text class="edge-label" x="112" y="82" text-anchor="middle">failed</text>
+<path class="edge" d="M360 82 H440" marker-end="url(#st)"/>
+<text class="edge-label" x="400" y="76" text-anchor="middle">Source</text>
+<path class="edge dashed" d="M512 102 V162 H288 V102" marker-end="url(#st)"/>
+<text class="edge-label" x="400" y="156" text-anchor="middle">Preview</text>
+<g class="node">
+<rect x="24" y="24" width="128" height="40" rx="6"/>
+<text class="title" x="38" y="48">Loading</text></g>
+<g class="node primary">
+<rect x="232" y="62" width="128" height="40" rx="6"/>
+<text class="title" x="246" y="86">Preview</text></g>
+<g class="node">
+<rect x="440" y="62" width="128" height="40" rx="6"/>
+<text class="title" x="454" y="86">Source</text></g>
+<g class="node attention">
+<rect x="24" y="100" width="128" height="40" rx="6"/>
+<text class="title" x="38" y="124">Error</text></g>
+</g>
+</svg>
+<figcaption>States shown next to the download button.</figcaption>
+</figure>
+<p>On error, Jira's Source view stays and the reason shows by the download button.</p><div class="accordion"><details><summary>Error reasons</summary><div class="body"><ul><li>file larger than 5 MB</li><li>not a valid Excalidraw file</li><li>issue not found</li><li>attachment not found</li><li><code>Jira returned &lt;status&gt;</code></li><li>could not load the file</li></ul></div></details></div></section>
+<section class="section"><h2>Contracts: manifest, messages and two GETs</h2>
+<div class="toolbar"><button class="btn" type="button" data-toggle-all="#contracts" data-label-open="Open all" data-label-close="Close all"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">Open all</span></button></div>
 <div class="contracts" id="contracts">
-<h3>Manifesto</h3><details class="contract cmd"><summary><span class="method cmd">CMD</span><code class="path">manifest.json · content_scripts</code><span class="sum">Dois scripts em <code>https://*.atlassian.net/*</code>.</span></summary><div class="body"><p>Superfície declarada no manifesto, versão 1.0.0, Manifest V3.</p><div class="table-wrap"><table><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody><tr><td><code>permissions</code></td><td><code>storage</code></td></tr><tr><td>Script isolado</td><td><code>content.js</code>, <code>document_idle</code></td></tr><tr><td>Script do page world</td><td><code>page.js</code>, <code>document_start</code>, <code>world: MAIN</code></td></tr><tr><td><code>background</code></td><td>service worker <code>background.js</code></td></tr><tr><td><code>sandbox.pages</code></td><td><code>preview.html</code></td></tr><tr><td><code>content_security_policy.sandbox</code></td><td><code>sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:</code></td></tr><tr><td><code>web_accessible_resources</code></td><td><code>preview.html</code>, <code>preview.js</code>, <code>preview.css</code> para <code>https://*.atlassian.net/*</code></td></tr></tbody></table></div></div></details>
-<h3>Mensagens internas</h3><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:editor-request</code><span class="sum">Content script pede o texto do editor ao page world.</span></summary><div class="body"><p>Enviada com <code>window.postMessage</code> para a origem da página. O page world ignora mensagens de outra janela.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-editor-req">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:editor-response</code><span class="sum">Page world devolve o texto do editor, ou <code>null</code>.</span></summary><div class="body"><p>Espera até 1500 ms o editor aparecer. O content script desiste após 2500 ms e usa o REST.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-editor-res">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:ready</code><span class="sum">preview.html avisa ao pai que pode renderizar.</span></summary><div class="body"><p>Enviada ao <code>window.parent</code> com destino <code>"*"</code>.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-ready">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:render</code><span class="sum">O pai envia o conteúdo a renderizar para preview.html.</span></summary><div class="body"><p>O iframe tem origem opaca: <code>"*"</code> é o único destino que o alcança. <code>framePreview</code>, em <code>src/preview-frame.ts</code>, monta o iframe e envia a mensagem. A página só aceita mensagem do próprio pai e com campos válidos.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-render">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:open-tab</code><span class="sum">Content script pede ao background que abra o preview em nova aba.</span></summary><div class="body"><p><code>chrome.runtime.sendMessage</code>. O background grava o snapshot em <code>chrome.storage.session</code> com um UUID e abre <code>tab.html?id=&lt;uuid&gt;</code>. Só em erro de cota, apaga os snapshots guardados e as abas deles mostram a mensagem de expirado. A constante é <code>OPEN_TAB_TYPE</code>.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-opentab">Ver JSON <span class="ct">mensagem</span></button></div></details>
-<h3>API REST do Jira</h3><details class="contract get"><summary><span class="method get">GET</span><code class="path">/rest/api/3/issue/{key}?fields=attachment</code><span class="sum">Lista os anexos do card para achar o arquivo do visualizador.</span></summary><div class="body"><p>Só roda no fallback. Escolhe o anexo de mesmo nome e tamanho compatível com o exibido; em empate, o mais recente.</p><h4>Autenticação</h4><p>Sessão do usuário no Jira (<code>credentials: include</code>, mesma origem).</p><h4>Parâmetros</h4><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Em</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>key</code> <span class="req">obrigatório</span></td><td>path</td><td>string</td><td>Chave do card, lida de <code>/browse/KEY</code> ou de <code>selectedIssue</code>.</td></tr><tr><td><code>fields</code></td><td>query</td><td>string</td><td>Fixo em <code>attachment</code>.</td></tr></tbody></table></div><h4>Respostas</h4><div class="resp"><span class="code c2">200</span><span>Usa <code>fields.attachment[]</code> com <code>id</code>, <code>filename</code>, <code>size</code>, <code>created</code>.</span></div><div class="resp"><span class="code c4">4xx</span><span>Qualquer status não OK vira o erro <code>Jira returned &lt;status&gt;</code>.</span></div></div></details><details class="contract get"><summary><span class="method get">GET</span><code class="path">/rest/api/3/attachment/content/{id}?redirect=false</code><span class="sum">Baixa o texto do anexo escolhido.</span></summary><div class="body"><p>Só roda depois do GET anterior. Recusa anexos acima de 5 MB antes de baixar.</p><h4>Autenticação</h4><p>Sessão do usuário no Jira (<code>credentials: include</code>).</p><h4>Parâmetros</h4><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Em</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code> <span class="req">obrigatório</span></td><td>path</td><td>string</td><td>Id do anexo escolhido.</td></tr><tr><td><code>redirect</code></td><td>query</td><td>boolean</td><td>Fixo em <code>false</code>.</td></tr></tbody></table></div><h4>Respostas</h4><div class="resp"><span class="code c2">200</span><span>O corpo é lido como texto.</span></div><div class="resp"><span class="code c4">4xx</span><span>Vira o erro <code>Jira returned &lt;status&gt;</code>.</span></div></div></details>
+<h3>Manifest</h3><details class="contract cmd"><summary><span class="method cmd">CMD</span><code class="path">manifest.json · content_scripts</code><span class="sum">Two scripts on <code>https://*.atlassian.net/*</code>, two sandbox pages.</span></summary><div class="body"><p>Surface declared in the manifest, version 1.2.0, Manifest V3.</p><div class="table-wrap"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody><tr><td><code>permissions</code></td><td><code>storage</code></td></tr><tr><td>Isolated script</td><td><code>content.js</code>, <code>document_idle</code></td></tr><tr><td>Page-world script</td><td><code>page.js</code>, <code>document_start</code>, <code>world: MAIN</code></td></tr><tr><td><code>background</code></td><td>service worker <code>background.js</code></td></tr><tr><td><code>sandbox.pages</code></td><td><code>preview.html</code>, <code>excalidraw.html</code></td></tr><tr><td><code>content_security_policy.sandbox</code></td><td><code>sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:</code></td></tr><tr><td><code>web_accessible_resources</code></td><td><code>preview.html</code>, <code>preview.js</code>, <code>preview.css</code>, <code>excalidraw.html</code>, <code>excalidraw.js</code>, <code>excalidraw.css</code> for <code>https://*.atlassian.net/*</code></td></tr></tbody></table></div></div></details>
+<h3>Internal messages</h3><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:editor-request</code><span class="sum">The content script asks the page world for the editor text.</span></summary><div class="body"><p>Sent with <code>window.postMessage</code> to the page origin. The page world ignores messages from other windows.</p><h4>Message body</h4><button class="body-link" type="button" data-detail="m-editor-req">View JSON <span class="ct">message</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:editor-response</code><span class="sum">The page world returns the editor text, or <code>null</code>.</span></summary><div class="body"><p>It waits up to 1500 ms for the editor to appear. The content script gives up after 2500 ms and uses REST.</p><h4>Message body</h4><button class="body-link" type="button" data-detail="m-editor-res">View JSON <span class="ct">message</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:ready</code><span class="sum">A sandbox page tells its parent it can render.</span></summary><div class="body"><p>Sent by <code>preview.html</code> or <code>excalidraw.html</code> to <code>window.parent</code> with target <code>"*"</code>. Both pages share <code>listenForRender</code> from <code>src/preview-render.ts</code>.</p><h4>Message body</h4><button class="body-link" type="button" data-detail="m-ready">View JSON <span class="ct">message</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:render</code><span class="sum">The parent sends the content to render to the sandbox page.</span></summary><div class="body"><p>The iframe has an opaque origin, so <code>"*"</code> is the only target that reaches it. <code>framePreview</code> builds the iframe on the page <code>previewPage(kind)</code> names and sends the message. The page accepts only its parent's message with valid fields; <code>kind</code> now accepts <code>excalidraw</code>.</p><h4>Message body</h4><button class="body-link" type="button" data-detail="m-render">View JSON <span class="ct">message</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:open-tab</code><span class="sum">The content script asks the background to open the Preview in a new tab.</span></summary><div class="body"><p><code>chrome.runtime.sendMessage</code>. The background stores the snapshot in <code>chrome.storage.session</code> under a UUID and opens <code>tab.html?id=&lt;uuid&gt;</code>. Only on a quota error does it drop stored snapshots; their tabs then show the expired message. The constant is <code>OPEN_TAB_TYPE</code>.</p><h4>Message body</h4><button class="body-link" type="button" data-detail="m-opentab">View JSON <span class="ct">message</span></button></div></details>
+<h3>Jira REST API</h3><details class="contract get"><summary><span class="method get">GET</span><code class="path">/rest/api/3/issue/{key}?fields=attachment</code><span class="sum">Lists the issue's attachments to find the viewer's file.</span></summary><div class="body"><p>Runs only in the fallback. Picks the attachment with the same name and a size matching the displayed one; on a tie, the most recent.</p><h4>Authentication</h4><p>The user's Jira session (<code>credentials: include</code>, same origin).</p><h4>Parameters</h4><div class="table-wrap"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>key</code> <span class="req">required</span></td><td>path</td><td>string</td><td>Issue key, read from <code>/browse/KEY</code> or <code>selectedIssue</code>.</td></tr><tr><td><code>fields</code></td><td>query</td><td>string</td><td>Fixed at <code>attachment</code>.</td></tr></tbody></table></div><h4>Responses</h4><div class="resp"><span class="code c2">200</span><span>Uses <code>fields.attachment[]</code> with <code>id</code>, <code>filename</code>, <code>size</code>, <code>created</code>.</span></div><div class="resp"><span class="code c4">4xx</span><span>Any non-OK status becomes the error <code>Jira returned &lt;status&gt;</code>.</span></div></div></details><details class="contract get"><summary><span class="method get">GET</span><code class="path">/rest/api/3/attachment/content/{id}?redirect=false</code><span class="sum">Downloads the chosen attachment's text.</span></summary><div class="body"><p>Runs only after the previous GET. Refuses attachments over 5 MB before downloading.</p><h4>Authentication</h4><p>The user's Jira session (<code>credentials: include</code>).</p><h4>Parameters</h4><div class="table-wrap"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>id</code> <span class="req">required</span></td><td>path</td><td>string</td><td>Id of the chosen attachment.</td></tr><tr><td><code>redirect</code></td><td>query</td><td>boolean</td><td>Fixed at <code>false</code>.</td></tr></tbody></table></div><h4>Responses</h4><div class="resp"><span class="code c2">200</span><span>The body is read as text.</span></div><div class="resp"><span class="code c4">4xx</span><span>Becomes the error <code>Jira returned &lt;status&gt;</code>.</span></div></div></details>
 </div></section>
 
-<section class="section"><h2>Modelo de segurança</h2>
+<section class="section"><h2>Security model</h2>
 <ul>
-<li>O preview roda num iframe <code>sandbox="allow-scripts"</code>, de origem opaca.</li>
-<li>Markdown passa por DOMPurify; só o renderizador executa scripts.</li>
-<li>Renderizador e Mermaid vão dentro da extensão.</li>
-<li>Única permissão: <code>storage</code>; scripts só em <code>*.atlassian.net</code>.</li>
+<li>Each Preview runs in a <code>sandbox="allow-scripts"</code> iframe, opaque origin.</li>
+<li>Markdown goes through DOMPurify; renderers and fonts ship in the extension.</li>
+<li>Only permission: <code>storage</code>; scripts only on <code>*.atlassian.net</code>.</li>
 </ul>
-<div class="accordion"><details><summary>Ressalva da CSP do sandbox</summary><div class="body"><p>A CSP do sandbox permite scripts inline, <code>'unsafe-eval'</code> e scripts <code>https:</code> remotos. É uma exceção documentada à regra do repositório: os scripts são do anexo, que roda em origem opaca, sem acesso ao Jira nem à extensão. Protótipos com bibliotecas de CDN funcionam, e o leitor de CSV do Mermaid usa <code>new Function</code>. Formulários e popups ficam bloqueados.</p></div></details></div></section>
+<div class="accordion"><details><summary>Sandbox CSP caveat</summary><div class="body"><p>The sandbox CSP allows inline scripts, <code>'unsafe-eval'</code> and remote <code>https:</code> scripts. It is a documented exception to the repo rule: the scripts are the attachment's, which runs in an opaque origin with no access to Jira or the extension. Prototypes that load CDN libraries work, Mermaid's CSV parser uses <code>new Function</code>, and forms and popups stay blocked.</p></div></details></div></section>
 
-<section class="section"><h2>Testes: 84 unitários e um e2e passaram</h2>
-<p>Vitest com jsdom. O e2e usou o Chromium do Playwright e um Jira falso.</p>
-<div class="accordion"><details><summary><code>editor-source.test.ts</code></summary><div class="body"><p>Leitura do editor (<code>cmView</code> e <code>rootView</code>), ponte por postMessage, ignora outras janelas, timeout.</p></div></details><details><summary><code>file-type.test.ts</code></summary><div class="body"><p>Extensões aceitas, leitura do tamanho exibido, vírgula decimal, limite de 5 MB.</p></div></details><details><summary><code>markdown.test.ts</code></summary><div class="body"><p>Tabelas e tarefas GFM, destaque de código, bloco desconhecido escapado, Mermaid com tema e com erro, remoção de script, handler e <code>javascript:</code>.</p></div></details><details><summary><code>messages.test.ts</code></summary><div class="body"><p>Validação da mensagem render e do tipo open-tab, iframe em sandbox, só aceita ready da própria janela.</p></div></details><details><summary><code>preview-controller.test.ts</code></summary><div class="body"><p>Preview por padrão, alternância, fallback REST (inclui editor com tamanho diferente do exibido), editor com o arquivo anterior (nova leitura, REST, texto sem mudança), mesmo arquivo reaberto, arquivo não suportado, limite de 5 MB, erro, troca de arquivo, fechamento, nova aba, controles removidos pelo Jira, tema.</p></div></details><details><summary><code>preview-render.test.ts</code></summary><div class="body"><p>HTML como documento inteiro, Markdown com tema, ready e render, mensagem malformada.</p></div></details><details><summary><code>rest-source.test.ts</code></summary><div class="body"><p>Chave do card, escolha do anexo, download sem redirect da CDN, sem chave, sem anexo, mais de 5 MB, erro HTTP.</p></div></details><details><summary><code>snapshot.test.ts</code></summary><div class="body"><p>Grava e abre a aba, apaga os snapshots só em erro de cota, id ausente ou desconhecido, aba expirada.</p></div></details><details><summary><code>viewer.test.ts</code></summary><div class="body"><p>Leitura do arquivo e tamanho, observação de abrir/trocar/fechar, posição dos botões, estado de erro, limpeza que restaura o estilo de posição do visualizador.</p></div></details></div>
-<div class="accordion"><details><summary>Resultado do e2e</summary><div class="body"><ul><li>HTML renderizado com scripts e cookies bloqueados.</li><li>Alternância Preview / Source.</li><li>Nova aba aberta pelo background.</li><li>Markdown com tabela, código colorido e SVG do Mermaid.</li><li>Atributo <code>onerror</code> removido.</li></ul></div></details></div></section>
+<section class="section"><h2>Tests: 150 unit tests in 14 files pass</h2>
+<p>Vitest with jsdom, run 12 nov 2026. The end-to-end run dates from v1.0.0.</p>
+<div class="accordion"><details><summary><code>canvas-view.test.ts</code> · 12 · new</summary><div class="body"><p>Fit with a 32 px margin, upscaling, zoom limits, empty drawing at 100%, center view, zoom around a point, pan, + / − steps, wheel zoom, line and page deltas, percentage label.</p></div></details><details><summary><code>canvas.test.ts</code> · 11 · new</summary><div class="body"><p>Opens fitted with zoom and background, wheel pans without scrolling the page, primary-button drag, lost pointer capture, 16 px lines, refit on resize only when untouched, other buttons ignored, + / − / 100%, Fit, stop at 3000%.</p></div></details><details><summary><code>excalidraw-render.test.ts</code> · 6 · new</summary><div class="body"><p>Live elements and files drawn on a Canvas, white default background, dark theme with the exported background, empty scene at 100%, export error shown and logged, invalid content.</p></div></details><details><summary><code>excalidraw-scene.test.ts</code> · 4 · new</summary><div class="body"><p>Reads elements, background and files; leaves deleted elements out; defaults a missing <code>appState</code> and <code>files</code>; names the invalid-file reason.</p></div></details><details><summary><code>editor-source.test.ts</code> · 7</summary><div class="body"><p>Editor reading (<code>cmView</code> and <code>rootView</code>), postMessage bridge, other windows ignored, timeout.</p></div></details><details><summary><code>file-type.test.ts</code> · 8</summary><div class="body"><p>Supported extensions, including <code>.excalidraw</code> and <code>.excalidraw.json</code>; the page each kind uses; displayed size, decimal comma, 5 MB limit.</p></div></details><details><summary><code>front-matter.test.ts</code> · 8</summary><div class="body"><p>Flat and nested YAML front matter, block scalars, a <code>---</code> that does not open the file, CRLF and <code>...</code>, table and highlighted output, escaping.</p></div></details><details><summary><code>markdown.test.ts</code> · 8</summary><div class="body"><p>GFM tables and task lists, code highlighting, unknown block escaped, Mermaid themed and failing, script, handler and <code>javascript:</code> removal.</p></div></details><details><summary><code>messages.test.ts</code> · 4</summary><div class="body"><p>Render message validation, including Excalidraw; sandboxed iframe; accepts ready only from its own frame.</p></div></details><details><summary><code>preview-controller.test.ts</code> · 19</summary><div class="body"><p>Preview by default, Excalidraw page for a valid drawing, Source kept for an invalid one, toggle, REST fallback, stale editor (reread, REST, unchanged text), same file reopened, unsupported file, 5 MB limit, error, file switch, close, new tab, controls removed by Jira, theme.</p></div></details><details><summary><code>preview-render.test.ts</code> · 4</summary><div class="body"><p>HTML as the whole document, Markdown with theme, ready and render, malformed message.</p></div></details><details><summary><code>rest-source.test.ts</code> · 10</summary><div class="body"><p>Issue key, attachment choice, download without the CDN redirect, no key, no attachment, over 5 MB, HTTP error.</p></div></details><details><summary><code>snapshot.test.ts</code> · 7</summary><div class="body"><p>Stores and opens the tab, drops snapshots only on a quota error, missing or unknown id, Excalidraw page for a drawing snapshot, expired tab.</p></div></details><details><summary><code>viewer.test.ts</code> · 9</summary><div class="body"><p>File name and size, open/switch/close, button position, error state, cleanup that restores the viewer's position style.</p></div></details></div>
+<div class="accordion"><details><summary>End-to-end result (v1.0.0)</summary><div class="body"><ul><li>HTML rendered with scripts running and cookies blocked.</li><li>Preview / Source toggle.</li><li>New tab opened by the background.</li><li>Markdown with a table, highlighted code and a Mermaid SVG.</li><li><code>onerror</code> attribute removed.</li></ul></div></details></div></section>
 
-<section class="section"><h2>Limitações</h2>
+<section class="section"><h2>Limitations</h2>
 <ul>
-<li>Só Jira Cloud (<code>*.atlassian.net</code>); não cobre Data Center, Server nem Confluence.</li>
-<li>URLs relativas dentro do arquivo não resolvem; as absolutas carregam.</li>
-<li>A leitura do editor depende de um interno do Jira (<code>cmView</code>). Se mudar, ou se o editor continuar com o arquivo anterior, o REST assume.</li>
-<li>O preview em nova aba é um snapshot e expira ao fechar o navegador ou quando o armazenamento da sessão enche e o erro de cota o apaga.</li>
-</ul></section>
+<li>Jira Cloud only (<code>*.atlassian.net</code>); not Data Center, Server or Confluence.</li>
+<li>Excalidraw Previews are view only: links do not click, embeds show a placeholder.</li>
+<li>Not checked with the extension loaded on a real Jira Cloud page.</li>
+</ul>
+<div class="accordion"><details><summary>More limitations</summary><div class="body"><ul><li>Relative URLs inside a file do not resolve; absolute URLs load.</li><li>Reading the editor depends on a Jira internal (<code>cmView</code>); REST takes over if it breaks.</li><li>The new-tab Preview is a snapshot; it expires when the browser closes or session storage fills.</li><li><code>.excalidraw.md</code> stays a Markdown Preview; <code>.excalidraw.svg</code> and <code>.png</code> are left to Jira.</li><li>The Excalidraw page bundles about 19 MB (renderer and fonts), loaded only for drawings.</li></ul></div></details></div></section>
 
-<section class="section"><h2>Instalar e compartilhar</h2>
-<div class="accordion"><details><summary>Passos de instalação</summary><div class="body"><ol>
-<li>Rode <code>pnpm build</code> (ou <code>pnpm --filter jira-attachment-preview build</code>).</li>
-<li>Em <code>chrome://extensions</code>, use Load unpacked em <code>exts/jira-attachment-preview/dist</code>.</li>
-<li>Abra um card do Jira Cloud e clique num anexo suportado.</li>
+<section class="section"><h2>Install and share</h2>
+<div class="accordion"><details><summary>Install steps</summary><div class="body"><ol>
+<li>Run <code>pnpm build</code> (or <code>pnpm --filter jira-attachment-preview build</code>).</li>
+<li>At <code>chrome://extensions</code>, use Load unpacked on <code>exts/jira-attachment-preview/dist</code>.</li>
+<li>Open a Jira Cloud issue and click a supported attachment.</li>
 </ol></div></details></div>
-<p>Para compartilhar: <code>pnpm zip jira-attachment-preview</code> gera o zip com o <code>INSTALL.md</code> e a mensagem de chat.</p></section>
-<section class="section"><h2>Glossário, módulos e backlog</h2>
-<div class="accordion"><details><summary>Termo novo: Content source</summary><div class="body"><p>A origem do texto do anexo: o editor do visualizador primeiro, o REST como fallback.</p></div></details><details><summary>Onde cada tipo vive</summary><div class="body"><ul><li><code>Theme</code>: <code>src/messages.ts</code>.</li><li><code>framePreview</code>: <code>src/preview-frame.ts</code>.</li><li><code>PreviewError</code> e <code>TOO_LARGE_REASON</code>: <code>src/preview-error.ts</code>.</li><li><code>VIEWER_SELECTOR</code>: <code>src/selectors.ts</code>, usado pelo content script e pelo page world.</li><li>Campo do elemento do visualizador: <code>ViewerFile.viewer</code>. O testid do Jira <code>media-viewer-popup</code> continua.</li></ul></div></details><details><summary>Backlog: JAP-1</summary><div class="body"><p>Mostrar anexos <code>.excalidraw</code> como desenho, em vez do JSON. Status: aberto. Arquivo: <code>BACKLOG.md</code>.</p></div></details></div></section>
-<template id="d-m-editor-req" data-title="editor-request · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>window.postMessage</code>, content script para page world</dd><dt>Fonte</dt><dd><code>src/editor-source.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+<p>To share: <code>pnpm zip jira-attachment-preview</code>.</p></section>
+
+<section class="section"><h2>Glossary, code map and backlog</h2>
+<div class="accordion"><details><summary>Glossary</summary><div class="body"><dl class="kv"><dt>Attachment viewer</dt><dd>Jira's full-screen modal that opens when an attachment is clicked.</dd><dt>Preview</dt><dd>The attachment rendered by the extension, as its author meant it to be seen.</dd><dt>Source view</dt><dd>Jira's own view of a text attachment, showing its source code.</dd><dt>Content source</dt><dd>Where the text comes from: the viewer's editor first, Jira's REST API as the fallback.</dd><dt>Canvas</dt><dd>New: the endless plane an Excalidraw Preview is drawn on, panned and zoomed.</dd><dt>Snapshot</dt><dd>A copy of a Preview's content taken when it opens in a new tab.</dd></dl></div></details><details><summary>Code map</summary><div class="body"><ul><li><code>content.ts</code>, <code>preview-controller.ts</code>: content script, loading, framing, toggle.</li><li><code>viewer.ts</code>, <code>selectors.ts</code>: attachment viewer DOM and shared selectors.</li><li><code>page.ts</code>, <code>editor-source.ts</code>: page-world editor reader.</li><li><code>rest-source.ts</code>: REST fallback.</li><li><code>file-type.ts</code>: Preview kinds, <code>previewPage</code>, size rules.</li><li><code>preview.ts</code>, <code>preview-render.ts</code>, <code>markdown.ts</code>, <code>front-matter.ts</code>: HTML and Markdown page.</li><li><code>excalidraw.ts</code>, <code>excalidraw-render.ts</code>, <code>excalidraw-scene.ts</code>: Excalidraw page.</li><li><code>canvas.ts</code>, <code>canvas-view.ts</code>, <code>static/excalidraw.css</code>: the Canvas.</li><li><code>messages.ts</code>, <code>preview-frame.ts</code>, <code>preview-error.ts</code>: messages, framing, error reasons.</li><li><code>background.ts</code>, <code>snapshot.ts</code>, <code>tab.ts</code>, <code>tab-page.ts</code>: new-tab snapshot.</li></ul></div></details><details><summary>Backlog: JAP-1 done</summary><div class="body"><p>Show <code>.excalidraw</code> attachments as their drawing instead of the JSON. Status: done in 1.2.0. File: <code>BACKLOG.md</code>.</p></div></details><details><summary>Version history</summary><div class="body"><ul><li>1.0.0: HTML and Markdown Previews.</li><li>1.1.0: YAML front matter in Markdown Previews.</li><li>1.2.0: Excalidraw Previews on a Canvas.</li></ul></div></details></div></section>
+<template id="d-m-editor-req" data-title="editor-request · message" data-wide><dl class="kv"><dt>Channel</dt><dd><code>window.postMessage</code>, content script to page world</dd><dt>Source</dt><dd><code>src/editor-source.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
   "type": "object",
   "required": [
     "type",
@@ -583,7 +618,8 @@ dl.kv dd { margin: 0; }
       "type": "string"
     }
   }
-}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:editor-request", "requestId": "&lt;uuid&gt;" }</code></pre></template><template id="d-m-editor-res" data-title="editor-response · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>window.postMessage</code>, page world para content script</dd><dt>Fonte</dt><dd><code>src/editor-source.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+}</code></pre><h4>Example</h4><pre class="json"><code>{ "type": "jira-attachment-preview:editor-request", "requestId": "&lt;uuid&gt;" }</code></pre></template>
+<template id="d-m-editor-res" data-title="editor-response · message" data-wide><dl class="kv"><dt>Channel</dt><dd><code>window.postMessage</code>, page world to content script</dd><dt>Source</dt><dd><code>src/editor-source.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
   "type": "object",
   "required": [
     "type",
@@ -603,7 +639,8 @@ dl.kv dd { margin: 0; }
       ]
     }
   }
-}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:editor-response", "requestId": "&lt;uuid&gt;", "text": null }</code></pre></template><template id="d-m-ready" data-title="ready · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>postMessage</code>, preview.html para o pai</dd><dt>Fonte</dt><dd><code>src/messages.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+}</code></pre><h4>Example</h4><pre class="json"><code>{ "type": "jira-attachment-preview:editor-response", "requestId": "&lt;uuid&gt;", "text": null }</code></pre></template>
+<template id="d-m-ready" data-title="ready · message" data-wide><dl class="kv"><dt>Channel</dt><dd><code>postMessage</code>, sandbox page to its parent</dd><dt>Source</dt><dd><code>src/messages.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
   "type": "object",
   "required": [
     "type"
@@ -613,7 +650,8 @@ dl.kv dd { margin: 0; }
       "const": "jira-attachment-preview:ready"
     }
   }
-}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:ready" }</code></pre></template><template id="d-m-render" data-title="render · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>postMessage</code>, pai para preview.html</dd><dt>Fonte</dt><dd><code>src/messages.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+}</code></pre><h4>Example</h4><pre class="json"><code>{ "type": "jira-attachment-preview:ready" }</code></pre></template>
+<template id="d-m-render" data-title="render · message" data-wide><dl class="kv"><dt>Channel</dt><dd><code>postMessage</code>, parent to sandbox page</dd><dt>Source</dt><dd><code>src/messages.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
   "type": "object",
   "required": [
     "type",
@@ -632,7 +670,8 @@ dl.kv dd { margin: 0; }
     "kind": {
       "enum": [
         "html",
-        "markdown"
+        "markdown",
+        "excalidraw"
       ]
     },
     "content": {
@@ -645,7 +684,8 @@ dl.kv dd { margin: 0; }
       ]
     }
   }
-}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:render", "fileName": "a.md", "kind": "markdown", "content": "# Título", "theme": "light" }</code></pre></template><template id="d-m-opentab" data-title="open-tab · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>chrome.runtime.sendMessage</code>, content script para background</dd><dt>Fonte</dt><dd><code>src/messages.ts</code> (<code>OPEN_TAB_TYPE</code>)</dd></dl><h4>Schema</h4><pre class="json"><code>{
+}</code></pre><h4>Example</h4><pre class="json"><code>{ "type": "jira-attachment-preview:render", "fileName": "a.md", "kind": "markdown", "content": "# Title", "theme": "light" }</code></pre></template>
+<template id="d-m-opentab" data-title="open-tab · message" data-wide><dl class="kv"><dt>Channel</dt><dd><code>chrome.runtime.sendMessage</code>, content script to background</dd><dt>Source</dt><dd><code>src/messages.ts</code> (<code>OPEN_TAB_TYPE</code>)</dd></dl><h4>Schema</h4><pre class="json"><code>{
   "type": "object",
   "required": [
     "type",
@@ -670,7 +710,8 @@ dl.kv dd { margin: 0; }
         "kind": {
           "enum": [
             "html",
-            "markdown"
+            "markdown",
+            "excalidraw"
           ]
         },
         "content": {
@@ -685,19 +726,21 @@ dl.kv dd { margin: 0; }
       }
     }
   }
-}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:open-tab", "snapshot": { "fileName": "a.md", "kind": "markdown", "content": "# Título", "theme": "light" } }</code></pre></template>
-<template id="d-content" data-title="Content script"><p>Observa o visualizador, decide pelo nome do arquivo, carrega o conteúdo, monta o iframe e o botão de alternância.</p><dl><dt>Arquivos</dt><dd><code>content.ts</code>, <code>preview-controller.ts</code>, <code>preview-frame.ts</code>, <code>preview-error.ts</code>, <code>viewer.ts</code>, <code>selectors.ts</code></dd></dl></template>
-<template id="d-editor" data-title="Leitor do editor"><p>Script no page world. Lê o texto completo do editor CodeMirror do Jira e o devolve por <code>postMessage</code>.</p><dl><dt>Arquivos</dt><dd><code>page.ts</code>, <code>editor-source.ts</code>, <code>selectors.ts</code></dd></dl></template>
-<template id="d-rest" data-title="REST Jira"><p>Usado quando o visualizador não mostra editor ou o texto do editor tem tamanho diferente do exibido (editor ainda com o arquivo anterior, após 6 novas leituras). Dois GETs com a sessão do usuário.</p><dl><dt>Arquivo</dt><dd><code>rest-source.ts</code></dd></dl></template>
-<template id="d-preview" data-title="preview.html"><p>Página em sandbox. HTML substitui o documento; Markdown vira HTML sanitizado com código colorido e Mermaid.</p><dl><dt>Arquivos</dt><dd><code>preview.ts</code>, <code>preview-render.ts</code>, <code>markdown.ts</code></dd></dl></template>
-<template id="d-bg" data-title="Background"><p>Recebe <code>jira-attachment-preview:open-tab</code>, grava o snapshot em <code>chrome.storage.session</code> e abre a aba. Só em erro de cota, apaga os snapshots guardados.</p><dl><dt>Arquivos</dt><dd><code>background.ts</code>, <code>snapshot.ts</code></dd></dl></template>
-<template id="d-tab" data-title="Nova aba"><p>Lê o snapshot pelo id e o mostra no mesmo <code>preview.html</code>. Sem snapshot, mostra "Preview expired — open it again from Jira".</p><dl><dt>Arquivos</dt><dd><code>tab.ts</code>, <code>tab-page.ts</code>, <code>preview-frame.ts</code></dd></dl></template>
-
-
+}</code></pre><h4>Example</h4><pre class="json"><code>{ "type": "jira-attachment-preview:open-tab", "snapshot": { "fileName": "a.md", "kind": "markdown", "content": "# Title", "theme": "light" } }</code></pre></template>
+<template id="d-content" data-title="Content script"><p>Watches the viewer, decides by file name, loads the content, checks an Excalidraw scene, frames the right sandbox page and adds the toggle.</p><dl><dt>Files</dt><dd><code>content.ts</code>, <code>preview-controller.ts</code>, <code>preview-frame.ts</code>, <code>preview-error.ts</code>, <code>viewer.ts</code>, <code>selectors.ts</code>, <code>file-type.ts</code></dd></dl></template>
+<template id="d-editor" data-title="Editor reader"><p>Page-world script. Reads the full text of Jira's CodeMirror editor and returns it with <code>postMessage</code>.</p><dl><dt>Files</dt><dd><code>page.ts</code>, <code>editor-source.ts</code>, <code>selectors.ts</code></dd></dl></template>
+<template id="d-rest" data-title="Jira REST"><p>Used when the viewer shows no editor, or its text has a different size from the displayed one (editor still on the previous file after 6 rereads). Two GETs with the user's session.</p><dl><dt>File</dt><dd><code>rest-source.ts</code></dd></dl></template>
+<template id="d-preview" data-title="preview.html"><p>Sandbox page for HTML and Markdown. HTML replaces the document; Markdown becomes sanitised HTML with highlighted code, Mermaid and a front matter table.</p><dl><dt>Files</dt><dd><code>preview.ts</code>, <code>preview-render.ts</code>, <code>markdown.ts</code>, <code>front-matter.ts</code>, <code>static/preview.css</code></dd></dl></template>
+<template id="d-excal" data-title="excalidraw.html"><p>Sandbox page for drawings, new in 1.2.0. Draws the scene to SVG with <code>@excalidraw/utils</code> and shows it on the Canvas. Minified bundle with the fonts, about 19 MB.</p><dl><dt>Files</dt><dd><code>excalidraw.ts</code>, <code>excalidraw-render.ts</code>, <code>excalidraw-scene.ts</code>, <code>canvas.ts</code>, <code>canvas-view.ts</code>, <code>static/excalidraw.css</code></dd></dl></template>
+<template id="d-bg" data-title="Background"><p>Receives <code>jira-attachment-preview:open-tab</code>, stores the snapshot in <code>chrome.storage.session</code> and opens the tab. Drops stored snapshots only on a quota error.</p><dl><dt>Files</dt><dd><code>background.ts</code>, <code>snapshot.ts</code></dd></dl></template>
+<template id="d-tab" data-title="New tab"><p>Reads the snapshot by id and frames the page <code>previewPage(kind)</code> names: <code>excalidraw.html</code> for a drawing, <code>preview.html</code> otherwise. With no snapshot, shows "Preview expired — open it again from Jira".</p><dl><dt>Files</dt><dd><code>tab.ts</code>, <code>tab-page.ts</code>, <code>preview-frame.ts</code></dd></dl></template>
+<template id="d-scene" data-title="parseScene"><p>Parses the JSON and returns the scene, or <code>null</code> when it is not <code>"type": "excalidraw"</code> with an <code>elements</code> array. Drops deleted elements; keeps <code>viewBackgroundColor</code> and embedded <code>files</code>. Runs in the content script and in the page.</p><dl><dt>File</dt><dd><code>src/excalidraw-scene.ts</code></dd></dl></template>
+<template id="d-export" data-title="exportScene"><p>Called with <code>type: "svg"</code>, the Jira theme, the scene background (white by default) and <code>skipInliningFonts: true</code>, since the page loads the bundled fonts once. The export's background <code>rect</code> paints the whole Canvas.</p><dl><dt>Files</dt><dd><code>src/excalidraw-render.ts</code>, <code>src/excalidraw.ts</code></dd></dl></template>
+<template id="d-canvas" data-title="Canvas"><p><code>mountCanvas</code> shows the SVG with an opening view: fit for a drawing, 100% centered for an empty one. Pure viewport math lives in <code>canvas-view.ts</code>: fit, zoom around a point, pan, steps, wheel deltas.</p><dl><dt>Files</dt><dd><code>src/canvas.ts</code>, <code>src/canvas-view.ts</code>, <code>static/excalidraw.css</code></dd></dl></template>
 
 <!-- /report-html:content -->
 </article></main>
-<dialog id="detail" aria-labelledby="dlg-title"><div class="dlg-head"><h3 class="dlg-title" id="dlg-title"></h3><button class="btn ghost dlg-close" type="button" aria-label="Fechar"><i class="ic ic-x" aria-hidden="true"></i>Fechar</button></div><div class="dlg-body"></div></dialog>
+<dialog id="detail" aria-labelledby="dlg-title"><div class="dlg-head"><h3 class="dlg-title" id="dlg-title"></h3><button class="btn ghost dlg-close" type="button" aria-label="Close"><i class="ic ic-x" aria-hidden="true"></i>Close</button></div><div class="dlg-body"></div></dialog>
 <script>
 /* report-html common behavior: detail dialog (click on text links and SVG nodes), accordion controls and the infinite canvas of every diagram. */
 (function () {
