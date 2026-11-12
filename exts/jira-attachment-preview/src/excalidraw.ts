@@ -3,8 +3,4 @@ import { exportScene } from "@excalidraw/utils";
 import { applyExcalidrawRender } from "./excalidraw-render";
 import { listenForRender } from "./preview-render";
 
-listenForRender(window, (doc, message) =>
-  applyExcalidrawRender(doc, message, {
-    exportScene: (options) => exportScene(options),
-  }),
-);
+listenForRender(window, (doc, message) => applyExcalidrawRender(doc, message, { exportScene }));

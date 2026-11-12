@@ -1,5 +1,5 @@
 // Messages between the extension's pages and scripts.
-import type { PreviewKind } from "./file-type";
+import { isPreviewKind, type PreviewKind } from "./file-type";
 
 export type Theme = "light" | "dark";
 
@@ -15,12 +15,12 @@ export interface PreviewPayload {
   theme: Theme;
 }
 
-/** Sent by preview.html to its parent once it can render. */
+/** Sent by a sandbox page (preview.html, excalidraw.html) to its parent once it can render. */
 export interface ReadyMessage {
   type: typeof READY_TYPE;
 }
 
-/** Sent to preview.html: render this payload. */
+/** Sent to a sandbox page: render this payload. */
 export interface RenderMessage extends PreviewPayload {
   type: typeof RENDER_TYPE;
 }
@@ -36,7 +36,7 @@ export function isRenderMessage(data: unknown): data is RenderMessage {
   const message = data as Partial<RenderMessage>;
   return (
     message.type === RENDER_TYPE &&
-    (message.kind === "html" || message.kind === "markdown" || message.kind === "excalidraw") &&
+    isPreviewKind(message.kind) &&
     typeof message.content === "string" &&
     (message.theme === "light" || message.theme === "dark")
   );

@@ -1,19 +1,21 @@
 // The Canvas: an endless plane that shows one SVG drawing, with Excalidraw's gestures (wheel pans,
 // Ctrl/⌘-wheel and pinch zoom around the pointer, drag pans) and a bottom-left zoom control.
 import {
+  centerView,
   fitView,
   panBy,
   type Size,
   stepZoom,
-  type View,
+  type Viewport,
+  wheelPixels,
   wheelZoom,
   zoomAt,
   zoomLabel,
 } from "./canvas-view";
 
 export interface CanvasHandle {
-  /** The current view, for tests and logs. */
-  view(): View;
+  /** The current viewport. */
+  view(): Viewport;
 }
 
 /** The SVG's own size in content pixels, from its width/height or viewBox. */
@@ -36,13 +38,15 @@ function button(doc: Document, label: string, title: string, onClick: () => void
 }
 
 /**
- * Replaces `root`'s children with a Canvas showing `svg` on `background`, fitted to `root`.
+ * Replaces `root`'s children with a Canvas showing `svg` on `background`, fitted to `root`, or at
+ * 100% when `empty` (an empty drawing's SVG is only its padding, nothing to fit).
  * The SVG is resized rather than CSS-scaled, so it stays sharp at any zoom.
  */
 export function mountCanvas(
   root: HTMLElement,
   svg: SVGSVGElement,
   background: string,
+  empty = false,
 ): CanvasHandle {
   const doc = root.ownerDocument;
   const content = svgSize(svg);
@@ -50,28 +54,37 @@ export function mountCanvas(
     svg.setAttribute("viewBox", `0 0 ${content.width} ${content.height}`);
   }
   const frame = (): Size => ({ width: root.clientWidth, height: root.clientHeight });
-  const center = () => ({ x: root.clientWidth / 2, y: root.clientHeight / 2 });
-  const initial = fitView(content, frame());
-  let view = initial;
+  const initialView = (): Viewport =>
+    empty ? centerView(content, frame()) : fitView(content, frame());
+  let fitted = initialView();
+  let view = fitted;
+  const refit = (): void => {
+    fitted = initialView();
+    apply(fitted);
+  };
+  const zoomToCenter = (zoom: number): void => {
+    const { width, height } = frame();
+    apply(zoomAt(view, zoom, { x: width / 2, y: height / 2 }));
+  };
 
   const canvas = doc.createElement("div");
   canvas.className = "canvas";
   canvas.style.background = background;
   svg.classList.add("canvas-drawing");
-  const label = button(doc, "", "Reset zoom to 100%", () => apply(zoomAt(view, 1, center())));
+  const label = button(doc, "", "Reset zoom to 100%", () => zoomToCenter(1));
   label.className = "zoom-level";
   const control = doc.createElement("div");
   control.className = "zoom-control";
   control.append(
-    button(doc, "−", "Zoom out", () => apply(zoomAt(view, stepZoom(view.zoom, -1), center()))),
+    button(doc, "−", "Zoom out", () => zoomToCenter(stepZoom(view.zoom, -1))),
     label,
-    button(doc, "+", "Zoom in", () => apply(zoomAt(view, stepZoom(view.zoom, 1), center()))),
-    button(doc, "Fit", "Zoom to fit the drawing", () => apply(fitView(content, frame()))),
+    button(doc, "+", "Zoom in", () => zoomToCenter(stepZoom(view.zoom, 1))),
+    button(doc, "Fit", "Zoom to fit the drawing", refit),
   );
   canvas.append(svg, control);
   root.replaceChildren(canvas);
 
-  function apply(next: View): void {
+  function apply(next: Viewport): void {
     view = next;
     svg.style.left = `${view.x}px`;
     svg.style.top = `${view.y}px`;
@@ -89,11 +102,13 @@ export function mountCanvas(
     "wheel",
     (event) => {
       event.preventDefault();
+      const dx = wheelPixels(event.deltaX, event.deltaMode, root.clientWidth);
+      const dy = wheelPixels(event.deltaY, event.deltaMode, root.clientHeight);
       // Chrome reports a trackpad pinch as a wheel event with ctrlKey set.
       if (event.ctrlKey || event.metaKey) {
-        apply(zoomAt(view, wheelZoom(view.zoom, event.deltaY), pointer(event)));
+        apply(zoomAt(view, wheelZoom(view.zoom, dy), pointer(event)));
       } else {
-        apply(panBy(view, -event.deltaX, -event.deltaY));
+        apply(panBy(view, -dx, -dy));
       }
     },
     { passive: false },
@@ -117,7 +132,13 @@ export function mountCanvas(
   };
   canvas.addEventListener("pointerup", endDrag);
   canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("lostpointercapture", endDrag);
 
-  apply(initial);
+  // Keep a drawing the user has not moved fitted when the frame is resized.
+  doc.defaultView?.addEventListener("resize", () => {
+    if (view === fitted) refit();
+  });
+
+  apply(fitted);
   return { view: () => view };
 }

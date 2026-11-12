@@ -73,6 +73,12 @@ describe("applyExcalidrawRender", () => {
     expect(document.querySelector<HTMLElement>(".canvas")?.style.background).toBe("rgb(30, 25, 0)");
   });
 
+  it("shows an empty scene at 100% instead of fitting its padding", async () => {
+    const content = JSON.stringify({ type: "excalidraw", elements: [] });
+    await applyExcalidrawRender(document, message({ content }), api());
+    expect(document.querySelector(".zoom-level")?.textContent).toBe("100%");
+  });
+
   it("shows and logs an error the export throws", async () => {
     const excalidraw: ExcalidrawApi = {
       exportScene: vi.fn(async () => {

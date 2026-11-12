@@ -58,7 +58,7 @@ export async function applyExcalidrawRender(
       data: scene,
       config: { theme: message.theme, canvasBackgroundColor: background, skipInliningFonts: true },
     });
-    mountCanvas(doc.body, svg, exportedBackground(svg, background));
+    mountCanvas(doc.body, svg, exportedBackground(svg, background), scene.elements.length === 0);
   } catch (error) {
     logError("Excalidraw render failed", message.fileName, error);
     showError(doc, error instanceof Error ? error.message : String(error));

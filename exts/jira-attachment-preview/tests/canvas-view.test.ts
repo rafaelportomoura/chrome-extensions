@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  centerView,
   fitView,
   MAX_ZOOM,
   MIN_ZOOM,
   panBy,
   stepZoom,
+  wheelPixels,
   wheelZoom,
   zoomAt,
   zoomLabel,
@@ -31,6 +33,12 @@ describe("fitView", () => {
 
   it("shows an empty drawing at 100%", () => {
     expect(fitView({ width: 0, height: 0 }, frame)).toEqual({ zoom: 1, x: 432, y: 232 });
+  });
+});
+
+describe("centerView", () => {
+  it("centers the content at 100%", () => {
+    expect(centerView({ width: 20, height: 20 }, frame)).toEqual({ zoom: 1, x: 422, y: 222 });
   });
 });
 
@@ -79,6 +87,14 @@ describe("wheelZoom", () => {
   it("stays inside the limits", () => {
     expect(wheelZoom(30, -100)).toBe(30);
     expect(wheelZoom(0.1, 100)).toBe(0.1);
+  });
+});
+
+describe("wheelPixels", () => {
+  it("reads pixel, line and page deltas as pixels", () => {
+    expect(wheelPixels(30, 0, 500)).toBe(30);
+    expect(wheelPixels(3, 1, 500)).toBe(48);
+    expect(wheelPixels(1, 2, 500)).toBe(500);
   });
 });
 

@@ -38,8 +38,8 @@ function pointer(type: string, init: { clientX: number; clientY: number; button?
 
 beforeEach(() => {
   root = document.createElement("main");
-  Object.defineProperty(root, "clientWidth", { value: 864 });
-  Object.defineProperty(root, "clientHeight", { value: 464 });
+  Object.defineProperty(root, "clientWidth", { value: 864, configurable: true });
+  Object.defineProperty(root, "clientHeight", { value: 464, configurable: true });
   document.body.append(root);
   canvas = mountCanvas(root, drawing(1600, 400), "#fff9db");
 });
@@ -80,6 +80,34 @@ describe("mountCanvas", () => {
     pointer("pointerup", { clientX: 30, clientY: 5 });
     pointer("pointermove", { clientX: 90, clientY: 90 });
     expect(canvas.view()).toEqual({ ...before, x: before.x + 20, y: before.y - 5 });
+  });
+
+  it("stops dragging when the pointer capture is lost", () => {
+    const before = canvas.view();
+    pointer("pointerdown", { clientX: 10, clientY: 10 });
+    element(".canvas").dispatchEvent(new Event("lostpointercapture"));
+    pointer("pointermove", { clientX: 50, clientY: 50 });
+    expect(canvas.view()).toEqual(before);
+  });
+
+  it("reads a line-mode wheel delta as lines of 16 px", () => {
+    const before = canvas.view();
+    wheel({ deltaY: 3, deltaMode: 1 });
+    expect(canvas.view().y).toBe(before.y - 48);
+  });
+
+  it("refits an untouched drawing when the frame is resized", () => {
+    Object.defineProperty(root, "clientWidth", { value: 464, configurable: true });
+    window.dispatchEvent(new Event("resize"));
+    expect(canvas.view().zoom).toBeCloseTo(0.25);
+  });
+
+  it("keeps a moved drawing where it is when the frame is resized", () => {
+    wheel({ deltaY: 30 });
+    const moved = canvas.view();
+    Object.defineProperty(root, "clientWidth", { value: 464, configurable: true });
+    window.dispatchEvent(new Event("resize"));
+    expect(canvas.view()).toEqual(moved);
   });
 
   it("ignores a drag with another button", () => {

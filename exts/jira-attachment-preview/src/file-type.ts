@@ -1,6 +1,12 @@
 // Which attachments get a Preview, and the size rules shared by every content source.
 
-export type PreviewKind = "html" | "markdown" | "excalidraw";
+export const PREVIEW_KINDS = ["html", "markdown", "excalidraw"] as const;
+
+export type PreviewKind = (typeof PREVIEW_KINDS)[number];
+
+export function isPreviewKind(value: unknown): value is PreviewKind {
+  return PREVIEW_KINDS.includes(value as PreviewKind);
+}
 
 /** Files larger than this are never previewed. */
 export const MAX_PREVIEW_BYTES = 5 * 1024 * 1024;

@@ -194,7 +194,7 @@ importers:
   exts/jira-attachment-preview:
     dependencies:
       '@excalidraw/utils':
-        specifier: 0.1.8
+        specifier: ^0.1.8
         version: 0.1.8
       dompurify:
         specifier: ^3.4.17
