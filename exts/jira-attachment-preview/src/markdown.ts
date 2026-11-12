@@ -3,8 +3,7 @@
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import { Marked, type Tokens } from "marked";
-
-export type Theme = "light" | "dark";
+import type { Theme } from "./messages";
 
 function escapeHtml(text: string): string {
   return text

@@ -2,15 +2,18 @@
 // the sandboxed preview page and handles the toggle.
 import {
   byteLength,
+  type DisplayedSize,
   MAX_PREVIEW_BYTES,
+  matchesDisplayedSize,
   type PreviewKind,
   parseDisplayedSize,
   previewKind,
 } from "./file-type";
 import { log, logError } from "./log";
-import type { Theme } from "./markdown";
-import { framePreview, type OpenTabMessage, type PreviewPayload } from "./messages";
-import { PreviewError, type RestSourceInput } from "./rest-source";
+import { OPEN_TAB_TYPE, type OpenTabMessage, type PreviewPayload, type Theme } from "./messages";
+import { PreviewError, TOO_LARGE_REASON } from "./preview-error";
+import { framePreview } from "./preview-frame";
+import type { RestSourceInput } from "./rest-source";
 import {
   type Controls,
   mountControls,
@@ -20,7 +23,6 @@ import {
 } from "./viewer";
 
 export interface ControllerDeps {
-  doc: Document;
   win: Window;
   pageUrl(): string;
   requestEditorText(win: Window): Promise<string | null>;
@@ -28,8 +30,6 @@ export interface ControllerDeps {
   previewUrl: string;
   sendMessage(message: OpenTabMessage): Promise<unknown>;
 }
-
-const TOO_LARGE = "file larger than 5 MB";
 
 export function jiraTheme(doc: Document): Theme {
   return doc.documentElement.dataset.colorMode === "dark" ? "dark" : "light";
@@ -52,7 +52,7 @@ export class PreviewController {
   /** Handles the viewer opening a file, switching to another, or closing (null). */
   async show(file: ViewerFile | null): Promise<void> {
     const generation = ++this.generation;
-    removeAdded(this.deps.doc);
+    removeAdded(this.deps.win.document);
     this.controls = null;
     this.host = null;
     this.lastPayload = null;
@@ -90,21 +90,33 @@ export class PreviewController {
   private async loadContent(file: ViewerFile): Promise<string> {
     const displayed = parseDisplayedSize(file.sizeText);
     if (displayed && displayed.bytes - displayed.unit / 2 > MAX_PREVIEW_BYTES) {
-      throw new PreviewError(TOO_LARGE);
+      throw new PreviewError(TOO_LARGE_REASON);
     }
     const content =
-      (await this.deps.requestEditorText(this.deps.win)) ??
+      (await this.editorText(displayed)) ??
       (await this.deps.fetchAttachmentText({
         pageUrl: this.deps.pageUrl(),
         fileName: file.name,
         sizeText: file.sizeText,
       }));
-    if (byteLength(content) > MAX_PREVIEW_BYTES) throw new PreviewError(TOO_LARGE);
+    if (byteLength(content) > MAX_PREVIEW_BYTES) throw new PreviewError(TOO_LARGE_REASON);
     return content;
   }
 
+  /**
+   * The editor's text, or null when there is none or when its size does not match the size the
+   * viewer shows: right after a file switch the editor may still hold the previous file.
+   */
+  private async editorText(displayed: DisplayedSize | null): Promise<string | null> {
+    const text = await this.deps.requestEditorText(this.deps.win);
+    if (text === null || displayed === null) return text;
+    if (matchesDisplayedSize(byteLength(text), displayed)) return text;
+    log("editor text does not match the displayed size; using Jira REST");
+    return null;
+  }
+
   private payload(file: ViewerFile, kind: PreviewKind, content: string): PreviewPayload {
-    return { fileName: file.name, kind, content, theme: jiraTheme(this.deps.doc) };
+    return { fileName: file.name, kind, content, theme: jiraTheme(this.deps.win.document) };
   }
 
   private setVisible(visible: boolean): void {
@@ -116,6 +128,6 @@ export class PreviewController {
   private openTab(file: ViewerFile, kind: PreviewKind): void {
     const snapshot = this.lastPayload;
     if (!snapshot || snapshot.fileName !== file.name || snapshot.kind !== kind) return;
-    void this.deps.sendMessage({ type: "openTab", snapshot });
+    void this.deps.sendMessage({ type: OPEN_TAB_TYPE, snapshot });
   }
 }

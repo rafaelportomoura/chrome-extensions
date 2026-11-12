@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, type vi } from "vitest";
 import type { PreviewPayload } from "../src/messages";
 import { loadSnapshot, openSnapshotTab } from "../src/snapshot";
 import { EXPIRED_TEXT, showSnapshot } from "../src/tab-page";
@@ -18,6 +18,23 @@ describe("openSnapshotTab", () => {
     const id = new URL(url).searchParams.get("id");
     expect(url).toMatch(/^chrome-extension:\/\/test-id\/tab\.html\?id=/);
     await expect(loadSnapshot(id)).resolves.toEqual(snapshot);
+  });
+});
+
+describe("openSnapshotTab when session storage is full", () => {
+  it("drops older snapshots to make room", async () => {
+    await chrome.storage.session.set({ "snapshot:old": snapshot, other: 1 });
+    const set = chrome.storage.session.set as unknown as ReturnType<typeof vi.fn>;
+    const original = set.getMockImplementation();
+    set.mockImplementationOnce(async () => {
+      throw new Error("QUOTA_BYTES quota exceeded");
+    });
+    if (original) set.mockImplementation(original);
+    await openSnapshotTab(snapshot);
+    await expect(loadSnapshot("old")).resolves.toBeNull();
+    const stored = await chrome.storage.session.get(null);
+    expect(Object.keys(stored).filter((k) => k.startsWith("snapshot:"))).toHaveLength(1);
+    expect(stored.other).toBe(1);
   });
 });
 

@@ -1,15 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
 import { type ControllerDeps, jiraTheme, PreviewController } from "../src/preview-controller";
-import { PreviewError } from "../src/rest-source";
+import { PreviewError } from "../src/preview-error";
 import { ADDED_ATTRIBUTE, readViewer } from "../src/viewer";
 import { openViewer, switchFile } from "./fixtures/viewer";
 
+/** Editor text whose size matches the fixture's "html · 14 KB". */
+const EDITOR_TEXT = `<p>from editor</p>${" ".repeat(14 * 1024 - 18)}`;
+
 function deps(overrides: Partial<ControllerDeps> = {}): ControllerDeps {
   return {
-    doc: document,
     win: window,
     pageUrl: () => "https://example.atlassian.net/browse/S-1",
-    requestEditorText: vi.fn(async () => "<p>from editor</p>"),
+    requestEditorText: vi.fn(async () => EDITOR_TEXT),
     fetchAttachmentText: vi.fn(async () => "<p>from rest</p>"),
     previewUrl: "about:blank",
     sendMessage: vi.fn(async () => undefined),
@@ -65,6 +67,13 @@ describe("PreviewController", () => {
     expect(host()).not.toBeNull();
   });
 
+  it("uses Jira REST when the editor still holds a file of another size", async () => {
+    openViewer("proto.html", "html · 14 KB");
+    const d = deps({ requestEditorText: vi.fn(async () => "<p>previous file</p>") });
+    await new PreviewController(d).show(current());
+    expect(d.fetchAttachmentText).toHaveBeenCalled();
+  });
+
   it("adds nothing for an unsupported file", async () => {
     openViewer("notes.txt", "txt · 1 KB");
     await new PreviewController(deps()).show(current());
@@ -81,7 +90,7 @@ describe("PreviewController", () => {
   });
 
   it("refuses content over 5 MB", async () => {
-    openViewer();
+    openViewer("big.html", "html · 5 MB");
     const big = "x".repeat(5 * 1024 * 1024 + 1);
     await new PreviewController(deps({ requestEditorText: vi.fn(async () => big) })).show(
       current(),
@@ -135,11 +144,11 @@ describe("PreviewController", () => {
     await new PreviewController(d).show(current());
     click("Open in new tab");
     expect(d.sendMessage).toHaveBeenCalledWith({
-      type: "openTab",
+      type: "jira-attachment-preview:open-tab",
       snapshot: {
         fileName: "proto.html",
         kind: "html",
-        content: "<p>from editor</p>",
+        content: EDITOR_TEXT,
         theme: "dark",
       },
     });

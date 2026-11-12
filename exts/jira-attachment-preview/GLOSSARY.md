@@ -16,6 +16,11 @@ _Avoid_: Render, view, display
 Jira's own view of a text attachment, showing its source code.
 _Avoid_: Code view, raw view
 
+**Content source**:
+Where the extension reads an attachment's text from: the viewer's code editor first, Jira's REST
+API as the fallback.
+_Avoid_: Loader, provider
+
 **Snapshot**:
 A copy of a Preview's content taken when it is opened in a new tab.
 _Avoid_: Cache, copy

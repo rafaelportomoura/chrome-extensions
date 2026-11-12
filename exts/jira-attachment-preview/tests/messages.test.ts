@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { framePreview, isRenderMessage, RENDER_TYPE } from "../src/messages";
+import { isRenderMessage, RENDER_TYPE } from "../src/messages";
+import { framePreview } from "../src/preview-frame";
 
 const payload = {
   fileName: "a.md",

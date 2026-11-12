@@ -5,7 +5,6 @@ import { fetchAttachmentText } from "./rest-source";
 import { watchViewer } from "./viewer";
 
 const controller = new PreviewController({
-  doc: document,
   win: window,
   pageUrl: () => location.href,
   requestEditorText,

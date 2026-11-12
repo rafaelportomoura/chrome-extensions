@@ -5,15 +5,16 @@ type Store = Record<string, unknown>;
 
 function storageArea(store: Store) {
   return {
-    get: vi.fn(async (keys: string | Store) => {
+    get: vi.fn(async (keys: string | Store | null) => {
+      if (keys === null) return { ...store };
       if (typeof keys === "string") return keys in store ? { [keys]: store[keys] } : {};
       return { ...keys, ...store };
     }),
     set: vi.fn(async (items: Store) => {
       Object.assign(store, items);
     }),
-    remove: vi.fn(async (key: string) => {
-      delete store[key];
+    remove: vi.fn(async (keys: string | string[]) => {
+      for (const key of Array.isArray(keys) ? keys : [keys]) delete store[key];
     }),
   };
 }

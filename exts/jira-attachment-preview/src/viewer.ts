@@ -3,13 +3,14 @@
 
 export const ADDED_ATTRIBUTE = "data-jira-attachment-preview";
 
-const POPUP = '[data-testid="media-viewer-popup"]';
+const VIEWER = '[data-testid="media-viewer-popup"]';
 const FILE_NAME = '[data-testid="media-viewer-file-name"]';
 const FILE_METADATA = '[data-testid="media-viewer-file-metadata-text"]';
 const DOWNLOAD_BUTTON = '[data-testid="media-viewer-download-button"]';
 
 export interface ViewerFile {
-  popup: HTMLElement;
+  /** The attachment viewer's root element. */
+  viewer: HTMLElement;
   name: string;
   /** The viewer's metadata text, e.g. "html · 14 KB". */
   sizeText: string;
@@ -17,11 +18,11 @@ export interface ViewerFile {
 
 /** The file the open attachment viewer shows, or null when no viewer is open. */
 export function readViewer(doc: Document): ViewerFile | null {
-  const popup = doc.querySelector<HTMLElement>(POPUP);
-  const name = popup?.querySelector(FILE_NAME)?.textContent?.trim();
-  if (!popup || !name) return null;
-  const sizeText = popup.querySelector(FILE_METADATA)?.textContent?.trim() ?? "";
-  return { popup, name, sizeText };
+  const viewer = doc.querySelector<HTMLElement>(VIEWER);
+  const name = viewer?.querySelector(FILE_NAME)?.textContent?.trim();
+  if (!viewer || !name) return null;
+  const sizeText = viewer.querySelector(FILE_METADATA)?.textContent?.trim() ?? "";
+  return { viewer, name, sizeText };
 }
 
 /**
@@ -38,7 +39,7 @@ export function watchViewer(
   const check = (): void => {
     const next = readViewer(doc);
     const same =
-      next?.popup === current?.popup &&
+      next?.viewer === current?.viewer &&
       next?.name === current?.name &&
       next?.sizeText === current?.sizeText;
     if (same && isIntact()) return;
@@ -84,7 +85,7 @@ function button(doc: Document, label: string, onClick: () => void): HTMLButtonEl
 
 /** Adds the "Preview / Source" toggle and "Open in new tab" left of the download button. */
 export function mountControls(file: ViewerFile, handlers: ControlsHandlers): Controls {
-  const doc = file.popup.ownerDocument;
+  const doc = file.viewer.ownerDocument;
   const root = doc.createElement("div");
   root.setAttribute(ADDED_ATTRIBUTE, "controls");
   root.style.cssText =
@@ -108,9 +109,9 @@ export function mountControls(file: ViewerFile, handlers: ControlsHandlers): Con
   status.style.cssText = "color:#ffb3a8;max-width:24em;";
 
   root.append(status, toggle, openTab);
-  const download = file.popup.querySelector(DOWNLOAD_BUTTON);
+  const download = file.viewer.querySelector(DOWNLOAD_BUTTON);
   if (download) download.before(root);
-  else file.popup.append(root);
+  else file.viewer.append(root);
 
   const select = (active: HTMLButtonElement | null): void => {
     for (const element of [preview, source]) {
@@ -135,26 +136,29 @@ export function mountControls(file: ViewerFile, handlers: ControlsHandlers): Con
   };
 }
 
-/** Top offset, inside the popup, of the area below the viewer's header. */
+const FALLBACK_HEADER_HEIGHT = 56;
+
+/** Top offset, inside the viewer, of the area below its header. */
 function contentTop(file: ViewerFile): number {
-  const name = file.popup.querySelector(FILE_NAME);
-  const download = file.popup.querySelector(DOWNLOAD_BUTTON);
+  const name = file.viewer.querySelector(FILE_NAME);
+  const download = file.viewer.querySelector(DOWNLOAD_BUTTON);
   let header: Element | null = name?.parentElement ?? null;
   while (header && download && !header.contains(download)) header = header.parentElement;
-  if (!header || header === file.popup) return 56;
-  const top = header.getBoundingClientRect().bottom - file.popup.getBoundingClientRect().top;
-  return top > 0 ? top : 56;
+  if (!header || header === file.viewer) return FALLBACK_HEADER_HEIGHT;
+  const top = header.getBoundingClientRect().bottom - file.viewer.getBoundingClientRect().top;
+  return top > 0 ? top : FALLBACK_HEADER_HEIGHT;
 }
 
 /** Adds the element that holds the Preview, covering the viewer below its header. */
 export function mountPreviewHost(file: ViewerFile): HTMLElement {
-  const doc = file.popup.ownerDocument;
+  const doc = file.viewer.ownerDocument;
+  // The host is positioned against the viewer, so the viewer must be a positioned element.
+  if (doc.defaultView?.getComputedStyle(file.viewer).position === "static") {
+    file.viewer.style.position = "relative";
+  }
   const host = doc.createElement("div");
   host.setAttribute(ADDED_ATTRIBUTE, "preview");
-  const place = (): void => {
-    host.style.cssText = `position:absolute;left:0;right:0;bottom:0;top:${contentTop(file)}px;z-index:1;background:#fff;`;
-  };
-  place();
-  file.popup.append(host);
+  host.style.cssText = `position:absolute;left:0;right:0;bottom:0;top:${contentTop(file)}px;z-index:1;background:#fff;`;
+  file.viewer.append(host);
   return host;
 }

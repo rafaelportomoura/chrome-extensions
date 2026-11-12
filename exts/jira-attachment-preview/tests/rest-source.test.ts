@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
+import { PreviewError } from "../src/preview-error";
 import {
   type Attachment,
   fetchAttachmentText,
   issueKeyFromUrl,
-  PreviewError,
   pickAttachment,
 } from "../src/rest-source";
 

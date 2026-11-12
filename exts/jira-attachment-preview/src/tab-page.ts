@@ -1,5 +1,5 @@
 // The new-tab page: shows a stored snapshot in the same sandboxed preview page as the viewer.
-import { framePreview } from "./messages";
+import { framePreview } from "./preview-frame";
 import { loadSnapshot } from "./snapshot";
 
 export const EXPIRED_TEXT = "Preview expired — open it again from Jira";

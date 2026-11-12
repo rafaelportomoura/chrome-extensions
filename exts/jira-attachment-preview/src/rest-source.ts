@@ -6,9 +6,7 @@ import {
   matchesDisplayedSize,
   parseDisplayedSize,
 } from "./file-type";
-
-/** A failure whose message is shown to the user on the toggle. */
-export class PreviewError extends Error {}
+import { PreviewError, TOO_LARGE_REASON } from "./preview-error";
 
 export interface Attachment {
   id: string;
@@ -68,7 +66,7 @@ export async function fetchAttachmentText(input: RestSourceInput): Promise<strin
     parseDisplayedSize(input.sizeText),
   );
   if (!attachment) throw new PreviewError("attachment not found");
-  if (attachment.size > MAX_PREVIEW_BYTES) throw new PreviewError("file larger than 5 MB");
+  if (attachment.size > MAX_PREVIEW_BYTES) throw new PreviewError(TOO_LARGE_REASON);
 
   const content = await getOk(
     fetchFn,
