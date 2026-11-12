@@ -44,8 +44,8 @@ export class PreviewController {
   private controls: Controls | null = null;
   private host: HTMLElement | null = null;
   private lastPayload: PreviewPayload | null = null;
-  /** The editor text used for the previous file, to spot an editor that has not switched yet. */
-  private previousEditorText: string | null = null;
+  /** The last file read from the editor, to spot an editor that has not switched file yet. */
+  private lastEditorRead: { fileKey: string; text: string } | null = null;
 
   constructor(private readonly deps: ControllerDeps) {}
 
@@ -98,47 +98,58 @@ export class PreviewController {
     if (displayed && displayed.bytes - displayed.unit / 2 > MAX_PREVIEW_BYTES) {
       throw new PreviewError(TOO_LARGE_REASON);
     }
-    const content =
-      (await this.editorText(displayed, generation)) ??
-      (await this.deps.fetchAttachmentText({
-        pageUrl: this.deps.pageUrl(),
-        fileName: file.name,
-        sizeText: file.sizeText,
-      }));
+    const editor = await this.editorText(file, displayed, generation);
+    let content = editor.text;
+    if (content === null) {
+      try {
+        content = await this.deps.fetchAttachmentText({
+          pageUrl: this.deps.pageUrl(),
+          fileName: file.name,
+          sizeText: file.sizeText,
+        });
+      } catch (error) {
+        // Two attachments can share their content: then the "previous file" text is right.
+        if (editor.unchanged === null) throw error;
+        log("Jira REST failed; using the editor text, which matches the previous file");
+        content = editor.unchanged;
+      }
+    }
     if (byteLength(content) > MAX_PREVIEW_BYTES) throw new PreviewError(TOO_LARGE_REASON);
     return content;
   }
 
   /**
-   * The editor's text, or null when there is none or it still holds the previous file. Right
-   * after a file switch Jira may not have replaced the editor yet: its text is then the previous
-   * file's (waited out, then given up on) or has a size other than the one the viewer shows.
+   * The editor's text, or a null `text` when there is none or it may still hold the previous file.
+   * Right after a file switch Jira may not have replaced the editor yet: its text then stays the
+   * previous file's (waited out, then returned as `unchanged`) or has a size other than the one
+   * the viewer shows.
    */
   private async editorText(
+    file: ViewerFile,
     displayed: DisplayedSize | null,
     generation: number,
-  ): Promise<string | null> {
+  ): Promise<{ text: string | null; unchanged: string | null }> {
+    const fileKey = `${file.name}\n${file.sizeText}`;
+    const previous = this.lastEditorRead;
+    const isStale = (text: string | null): boolean =>
+      text !== null && previous !== null && previous.fileKey !== fileKey && text === previous.text;
     let text = await this.deps.requestEditorText(this.deps.win);
-    for (
-      let retry = 0;
-      text !== null && text === this.previousEditorText && retry < STALE_RETRIES;
-      retry++
-    ) {
+    for (let retry = 0; isStale(text) && retry < STALE_RETRIES; retry++) {
       await new Promise((resolve) => setTimeout(resolve, STALE_RETRY_MS));
-      if (generation !== this.generation) return null;
+      if (generation !== this.generation) return { text: null, unchanged: null };
       text = await this.deps.requestEditorText(this.deps.win);
     }
-    if (text === null) return null;
-    if (text === this.previousEditorText) {
+    if (text === null) return { text: null, unchanged: null };
+    if (isStale(text)) {
       log("editor still shows the previous file; using Jira REST");
-      return null;
+      return { text: null, unchanged: text };
     }
     if (displayed !== null && !matchesDisplayedSize(byteLength(text), displayed)) {
       log("editor text does not match the displayed size; using Jira REST");
-      return null;
+      return { text: null, unchanged: null };
     }
-    this.previousEditorText = text;
-    return text;
+    if (generation === this.generation) this.lastEditorRead = { fileKey, text };
+    return { text, unchanged: null };
   }
 
   private payload(file: ViewerFile, kind: PreviewKind, content: string): PreviewPayload {

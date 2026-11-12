@@ -16,6 +16,7 @@ Built with `pnpm --filter jira-attachment-preview build`; load
 | `src/page.ts`, `src/editor-source.ts`                            | Page-world script that hands the viewer editor's full text to the content script. |
 | `src/rest-source.ts`                                             | Fallback: finds and downloads the attachment through Jira's REST API.             |
 | `src/file-type.ts`                                               | Supported extensions, displayed-size parsing, the 5 MB limit.                     |
+| `src/selectors.ts`                                               | Jira attachment viewer selectors shared by both worlds.                           |
 | `src/preview.ts`, `src/preview-render.ts`, `static/preview.html` | Sandbox page that renders one Preview.                                            |
 | `src/markdown.ts`, `static/preview.css`                          | Markdown to sanitised HTML, code highlighting, Mermaid diagrams, light/dark.      |
 | `src/messages.ts`                                                | Messages between the scripts and pages; frames the preview page.                  |

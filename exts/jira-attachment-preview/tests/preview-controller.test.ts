@@ -114,6 +114,37 @@ describe("PreviewController", () => {
     );
   });
 
+  it("keeps the editor text when two files share it and Jira REST fails", async () => {
+    vi.useFakeTimers();
+    openViewer("a.html", "html · 14 KB");
+    const d = deps({
+      fetchAttachmentText: vi.fn(async () => {
+        throw new PreviewError("issue not found");
+      }),
+    });
+    const controller = new PreviewController(d);
+    await controller.show(current());
+    switchFile("copy-of-a.html", "html · 14 KB");
+    const showing = controller.show(current());
+    await vi.runAllTimersAsync();
+    await showing;
+    vi.useRealTimers();
+    expect(d.fetchAttachmentText).toHaveBeenCalled();
+    expect(host()?.querySelector("iframe")?.title).toBe("Preview of copy-of-a.html");
+  });
+
+  it("reads the editor again when the same file is shown again", async () => {
+    openViewer();
+    const d = deps();
+    const controller = new PreviewController(d);
+    await controller.show(current());
+    await controller.show(null);
+    openViewer();
+    await controller.show(current());
+    expect(d.fetchAttachmentText).not.toHaveBeenCalled();
+    expect(host()).not.toBeNull();
+  });
+
   it("adds nothing for an unsupported file", async () => {
     openViewer("notes.txt", "txt · 1 KB");
     await new PreviewController(deps()).show(current());

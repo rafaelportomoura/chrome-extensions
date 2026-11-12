@@ -4,7 +4,7 @@
 // through window.postMessage, which carries data between the two worlds (CustomEvent details
 // do not reliably cross them).
 
-import { VIEWER_SELECTOR } from "./viewer";
+import { VIEWER_SELECTOR } from "./selectors";
 
 export const REQUEST_TYPE = "jira-attachment-preview:editor-request";
 export const RESPONSE_TYPE = "jira-attachment-preview:editor-response";

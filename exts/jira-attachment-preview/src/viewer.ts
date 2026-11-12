@@ -1,12 +1,12 @@
 // Adapter for Jira's attachment viewer: finds the file it shows and adds the extension's controls
 // and Preview to it. Every added element carries ADDED_ATTRIBUTE so it can be removed as a set.
 
+import { VIEWER_SELECTOR } from "./selectors";
+
 export const ADDED_ATTRIBUTE = "data-jira-attachment-preview";
 /** Marks a viewer the extension made a positioned element, so cleanup can undo it. */
 export const POSITIONED_ATTRIBUTE = "data-jira-attachment-preview-positioned";
 
-/** The attachment viewer's root element. */
-export const VIEWER_SELECTOR = '[data-testid="media-viewer-popup"]';
 const FILE_NAME = '[data-testid="media-viewer-file-name"]';
 const FILE_METADATA = '[data-testid="media-viewer-file-metadata-text"]';
 const DOWNLOAD_BUTTON = '[data-testid="media-viewer-download-button"]';
