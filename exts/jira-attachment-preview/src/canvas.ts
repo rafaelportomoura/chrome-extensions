@@ -56,11 +56,11 @@ export function mountCanvas(
   const frame = (): Size => ({ width: root.clientWidth, height: root.clientHeight });
   const initialView = (): Viewport =>
     initial === "center" ? centerView(content, frame()) : fitView(content, frame());
-  let fitted = initialView();
-  let view = fitted;
-  const refit = (): void => {
-    fitted = initialView();
-    apply(fitted);
+  let opening = initialView();
+  let view = opening;
+  const restoreOpening = (): void => {
+    opening = initialView();
+    apply(opening);
   };
   const zoomToCenter = (zoom: number): void => {
     const { width, height } = frame();
@@ -79,7 +79,7 @@ export function mountCanvas(
     button(doc, "−", "Zoom out", () => zoomToCenter(stepZoom(view.zoom, -1))),
     label,
     button(doc, "+", "Zoom in", () => zoomToCenter(stepZoom(view.zoom, 1))),
-    button(doc, "Fit", "Zoom to fit the drawing", refit),
+    button(doc, "Fit", "Back to the opening view", restoreOpening),
   );
   canvas.append(svg, control);
   root.replaceChildren(canvas);
@@ -134,11 +134,11 @@ export function mountCanvas(
   canvas.addEventListener("pointercancel", endDrag);
   canvas.addEventListener("lostpointercapture", endDrag);
 
-  // Keep a drawing the user has not moved fitted when the frame is resized.
+  // Keep a drawing the user has not moved in its opening view when the frame is resized.
   doc.defaultView?.addEventListener("resize", () => {
-    if (view === fitted) refit();
+    if (view === opening) restoreOpening();
   });
 
-  apply(fitted);
+  apply(opening);
   return { view: () => view };
 }

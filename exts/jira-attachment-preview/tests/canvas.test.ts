@@ -132,7 +132,7 @@ describe("mountCanvas", () => {
     const initial = canvas.view();
     wheel({ deltaY: -50, ctrlKey: true, clientX: 5, clientY: 5 });
     wheel({ deltaX: 40, deltaY: 40 });
-    click("Zoom to fit the drawing");
+    click("Back to the opening view");
     expect(canvas.view()).toEqual(initial);
   });
 

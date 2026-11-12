@@ -49,7 +49,7 @@ Built with `pnpm --filter jira-attachment-preview build`; load
      the renderer runs scripts. It follows Jira's light or dark theme;
    - Excalidraw is drawn to SVG with `@excalidraw/utils` in its own sandbox page,
      `excalidraw.html`, and shown on a Canvas: it opens zoomed to fit (an empty drawing at 100%)
-     and stays fitted on resize until moved, the wheel pans,
+     and keeps that opening view on resize until moved, the wheel pans,
      Ctrl/⌘ + wheel or a pinch zooms around the pointer (10%–3000%), dragging pans, and the
      bottom-left control has −, the zoom (click for 100%), + and Fit. It follows Jira's theme
      (Excalidraw's dark mode, or the file's background in light), with the fonts bundled and
