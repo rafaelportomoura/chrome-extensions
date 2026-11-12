@@ -11,9 +11,11 @@ const BUTTONS = 'button, [role="button"]';
 
 /** The visible, enabled "Sign in with Microsoft" button, if the page shows one. */
 export function findSignInButton(ctx: ClickContext): HTMLElement | undefined {
-  return candidates(ctx, BUTTONS)
-    .filter(isEnabled)
-    .find((el) => matchesLabel(buttonLabel(el), SIGN_IN_LABELS));
+  return candidates(
+    ctx,
+    BUTTONS,
+    (el) => isEnabled(el) && matchesLabel(buttonLabel(el), SIGN_IN_LABELS),
+  )[0];
 }
 
 /** Whether a PIP path is one of the app's sign-in routes (`/auth/sign-in`, `/auth/login`, ...). */

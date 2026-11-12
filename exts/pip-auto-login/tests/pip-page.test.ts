@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   findSignInButton,
   isAuthPath,
@@ -81,5 +81,15 @@ describe("nextPipStep", () => {
   it("waits on a sign-in route without the button", async () => {
     const step = await nextPipStep(state({ pathname: "/auth/callback", outsideSince: 0 }));
     expect(step).toBe("wait");
+  });
+});
+
+describe("findSignInButton layout cost", () => {
+  it("measures only the buttons whose label matches", () => {
+    document.body.innerHTML = `${"<button>Other</button>".repeat(20)}<button>Sign in with Microsoft</button>`;
+    const measure = vi.spyOn(Element.prototype, "getBoundingClientRect");
+
+    findSignInButton({ doc: document, clicked: new WeakSet<Element>() });
+    expect(measure).toHaveBeenCalledTimes(1);
   });
 });

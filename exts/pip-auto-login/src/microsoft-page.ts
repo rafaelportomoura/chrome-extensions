@@ -28,7 +28,7 @@ export function advance(ctx: PageContext): boolean {
 }
 
 export function pickAccount(ctx: PageContext): boolean {
-  const accounts = candidates(ctx, ACCOUNT_SELECTOR).filter((el) => EMAIL.test(emailOf(el)));
+  const accounts = candidates(ctx, ACCOUNT_SELECTOR, (el) => EMAIL.test(emailOf(el)));
   if (accounts.length === 0) return false;
 
   const target = choose(accounts, ctx.preferredAccount.trim().toLowerCase());
@@ -40,9 +40,11 @@ export function pickAccount(ctx: PageContext): boolean {
 
 export function staySignedIn(ctx: PageContext): boolean {
   if (!isStaySignedInPage(ctx.doc)) return false;
-  const yes = candidates(ctx, BUTTONS)
-    .filter(isEnabled)
-    .find((el) => matchesLabel(buttonLabel(el), STAY_SIGNED_IN_LABELS));
+  const yes = candidates(
+    ctx,
+    BUTTONS,
+    (el) => isEnabled(el) && matchesLabel(buttonLabel(el), STAY_SIGNED_IN_LABELS),
+  )[0];
   if (!yes) return false;
 
   log("answering yes to stay signed in");

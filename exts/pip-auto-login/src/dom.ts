@@ -6,10 +6,20 @@ export interface ClickContext {
   clicked: WeakSet<Element>;
 }
 
-export function candidates(ctx: ClickContext, selector: string): HTMLElement[] {
+/**
+ * Visible, not yet clicked elements matching `selector` and `accept`. `accept` runs before the
+ * visibility check, which forces a layout: on a page polled for its whole lifetime, only the
+ * few elements that pass `accept` get measured.
+ */
+export function candidates(
+  ctx: ClickContext,
+  selector: string,
+  accept: (el: HTMLElement) => boolean = () => true,
+): HTMLElement[] {
   return [...ctx.doc.querySelectorAll<HTMLElement>(selector)]
-    .filter(isVisible)
-    .filter((el) => !ctx.clicked.has(el));
+    .filter((el) => !ctx.clicked.has(el))
+    .filter(accept)
+    .filter(isVisible);
 }
 
 export function click(ctx: ClickContext, el: HTMLElement): true {
