@@ -58,7 +58,9 @@ export async function applyExcalidrawRender(
       data: scene,
       config: { theme: message.theme, canvasBackgroundColor: background, skipInliningFonts: true },
     });
-    mountCanvas(doc.body, svg, exportedBackground(svg, background), scene.elements.length === 0);
+    // An empty drawing's SVG is only the export padding: nothing to fit.
+    const initial = scene.elements.length === 0 ? "center" : "fit";
+    mountCanvas(doc.body, svg, exportedBackground(svg, background), { initial });
   } catch (error) {
     logError("Excalidraw render failed", message.fileName, error);
     showError(doc, error instanceof Error ? error.message : String(error));

@@ -38,15 +38,15 @@ function button(doc: Document, label: string, title: string, onClick: () => void
 }
 
 /**
- * Replaces `root`'s children with a Canvas showing `svg` on `background`, fitted to `root`, or at
- * 100% when `empty` (an empty drawing's SVG is only its padding, nothing to fit).
+ * Replaces `root`'s children with a Canvas showing `svg` on `background`, opening fitted to `root`
+ * (`initial: "fit"`) or at 100% in its center (`initial: "center"`).
  * The SVG is resized rather than CSS-scaled, so it stays sharp at any zoom.
  */
 export function mountCanvas(
   root: HTMLElement,
   svg: SVGSVGElement,
   background: string,
-  empty = false,
+  { initial }: { initial: "fit" | "center" } = { initial: "fit" },
 ): CanvasHandle {
   const doc = root.ownerDocument;
   const content = svgSize(svg);
@@ -55,7 +55,7 @@ export function mountCanvas(
   }
   const frame = (): Size => ({ width: root.clientWidth, height: root.clientHeight });
   const initialView = (): Viewport =>
-    empty ? centerView(content, frame()) : fitView(content, frame());
+    initial === "center" ? centerView(content, frame()) : fitView(content, frame());
   let fitted = initialView();
   let view = fitted;
   const refit = (): void => {
