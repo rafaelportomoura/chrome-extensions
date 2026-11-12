@@ -26,3 +26,5 @@ _Avoid_: Sideload, dev install
 - [GCP Auto login](exts/gcp-auto-login/GLOSSARY.md): signs in through the Google pages opened
   by the gcloud CLI
 - [PIP Auto login](exts/pip-auto-login/GLOSSARY.md): signs in to PIP through Microsoft SSO
+- [Attachment Preview for Jira](exts/jira-attachment-preview/GLOSSARY.md): renders HTML and
+  Markdown attachments in the Jira Cloud attachment viewer
