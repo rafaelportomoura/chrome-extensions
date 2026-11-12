@@ -1,5 +1,5 @@
 // Sandbox page entry (opaque origin, no chrome.* APIs): renders the Preview its parent sends.
 import mermaid from "mermaid";
-import { listenForRender } from "./preview-render";
+import { applyRender, listenForRender } from "./preview-render";
 
-listenForRender(window, mermaid);
+listenForRender(window, (doc, message) => applyRender(doc, message, mermaid));

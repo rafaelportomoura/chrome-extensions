@@ -9,6 +9,6 @@ Each item has a key (`JAP-<n>`, never reused) to pass as the ticket when plannin
 ## JAP-1 — Preview `.excalidraw` attachments
 
 - **Slug**: `excalidraw-preview`
-- **Status**: open
+- **Status**: done (planned in `~/Documents/tasks/chrome-extensions/exts/20261112-excalidraw-preview/`)
 - **What**: Show an `.excalidraw` attachment as its drawing in the attachment viewer, instead of
   its JSON source.

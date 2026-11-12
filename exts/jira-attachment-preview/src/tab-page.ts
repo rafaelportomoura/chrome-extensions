@@ -1,4 +1,5 @@
 // The new-tab page: shows a stored snapshot in the same sandboxed preview page as the viewer.
+import { previewPage } from "./file-type";
 import { framePreview } from "./preview-frame";
 import { loadSnapshot } from "./snapshot";
 
@@ -15,5 +16,5 @@ export async function showSnapshot(doc: Document, search: string): Promise<void>
     return;
   }
   doc.title = snapshot.fileName;
-  framePreview(main, snapshot, chrome.runtime.getURL("preview.html"));
+  framePreview(main, snapshot, chrome.runtime.getURL(previewPage(snapshot.kind)));
 }

@@ -14,6 +14,10 @@ describe("isRenderMessage", () => {
     expect(isRenderMessage({ type: RENDER_TYPE, ...payload })).toBe(true);
   });
 
+  it("accepts an Excalidraw render message", () => {
+    expect(isRenderMessage({ type: RENDER_TYPE, ...payload, kind: "excalidraw" })).toBe(true);
+  });
+
   it.each([null, "x", { type: RENDER_TYPE, ...payload, kind: "svg" }, { ...payload }])(
     "rejects %j",
     (data) => {

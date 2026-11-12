@@ -66,6 +66,17 @@ describe("showSnapshot", () => {
     expect(document.title).toBe("proto.html");
   });
 
+  it("frames the Excalidraw page for a drawing", async () => {
+    await chrome.storage.session.set({
+      "snapshot:xyz": { ...snapshot, fileName: "flow.excalidraw", kind: "excalidraw" },
+    });
+    document.body.innerHTML = "<main></main>";
+    await showSnapshot(document, "?id=xyz");
+    expect(document.querySelector("main iframe")?.getAttribute("src")).toBe(
+      "chrome-extension://test-id/excalidraw.html",
+    );
+  });
+
   it("explains an expired snapshot", async () => {
     document.body.innerHTML = "<main></main>";
     await showSnapshot(document, "?id=gone");

@@ -9,7 +9,7 @@ locally with Chrome's "Load unpacked"; none is published to the Chrome Web Store
 | --------------------------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | [`exts/gcp-auto-login`](exts/gcp-auto-login/)                   | GCP Auto login              | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`.     |
 | [`exts/pip-auto-login`](exts/pip-auto-login/)                   | PIP Auto login              | Signs in to PIP through Microsoft SSO: clicks "Sign in with Microsoft", picks the account, confirms "Stay signed in?". |
-| [`exts/jira-attachment-preview`](exts/jira-attachment-preview/) | Attachment Preview for Jira | Renders HTML and Markdown attachments in the Jira Cloud attachment viewer instead of their source code.                |
+| [`exts/jira-attachment-preview`](exts/jira-attachment-preview/) | Attachment Preview for Jira | Renders HTML, Markdown and Excalidraw attachments in the Jira Cloud attachment viewer instead of their source code.    |
 
 Each extension folder has its own `README.md` (how it works, settings, limitations),
 `GLOSSARY.md` and `DESCRIPTION.md` (what it is, for sharing).

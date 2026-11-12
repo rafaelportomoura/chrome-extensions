@@ -1,0 +1,91 @@
+/* Excalidraw Preview: a full-frame Canvas with a bottom-left zoom control, light and dark. */
+:root {
+  color-scheme: light;
+  --control-fg: #1b1b1f;
+  --control-bg: #ffffff;
+  --control-hover: #f1f0ff;
+  --control-border: #e0dfff;
+  --error-fg: #c92a2a;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --control-fg: #e3e3e8;
+  --control-bg: #232329;
+  --control-hover: #2e2d39;
+  --control-border: #3d3d4a;
+  --error-fg: #ff8787;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font:
+    14px / 1.4 system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+
+.canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.canvas.dragging {
+  cursor: grabbing;
+}
+
+.canvas-drawing {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+.zoom-control {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: stretch;
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+  overflow: hidden;
+  cursor: default;
+}
+
+.zoom-control button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--control-fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.zoom-control button:hover {
+  background: var(--control-hover);
+}
+
+.zoom-control .zoom-level {
+  min-width: 60px;
+  font-variant-numeric: tabular-nums;
+}
+
+.excalidraw-error {
+  margin: 24px;
+  color: var(--error-fg);
+  white-space: pre-wrap;
+}

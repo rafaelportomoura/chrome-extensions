@@ -1,5 +1,6 @@
 // Content script on *.atlassian.net: adds the Preview to Jira's attachment viewer.
 import { requestEditorText } from "./editor-source";
+import { previewPage } from "./file-type";
 import { PreviewController } from "./preview-controller";
 import { fetchAttachmentText } from "./rest-source";
 import { watchViewer } from "./viewer";
@@ -9,7 +10,7 @@ const controller = new PreviewController({
   pageUrl: () => location.href,
   requestEditorText,
   fetchAttachmentText,
-  previewUrl: chrome.runtime.getURL("preview.html"),
+  previewUrl: (kind) => chrome.runtime.getURL(previewPage(kind)),
   sendMessage: (message) => chrome.runtime.sendMessage(message),
 });
 

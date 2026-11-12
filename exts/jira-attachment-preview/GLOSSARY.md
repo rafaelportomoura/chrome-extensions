@@ -1,6 +1,6 @@
 # Attachment Preview for Jira
 
-Renders HTML and Markdown attachments inside Jira Cloud's attachment viewer.
+Renders HTML, Markdown and Excalidraw attachments inside Jira Cloud's attachment viewer.
 
 ## Language
 
@@ -20,6 +20,10 @@ _Avoid_: Code view, raw view
 Where the extension reads an attachment's text from: the viewer's code editor first, Jira's REST
 API as the fallback.
 _Avoid_: Loader, provider
+
+**Canvas**:
+The endless plane an Excalidraw Preview is drawn on, which the user pans and zooms.
+_Avoid_: Board, stage, whiteboard
 
 **Snapshot**:
 A copy of a Preview's content taken when it is opened in a new tab.

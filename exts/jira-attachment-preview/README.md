@@ -1,7 +1,7 @@
 # Attachment Preview for Jira
 
-Jira Cloud's attachment viewer shows HTML and Markdown attachments as source code. This extension
-renders them in place: open the attachment and its Preview replaces the Source view, with a
+Jira Cloud's attachment viewer shows HTML, Markdown and Excalidraw attachments as source code. This
+extension renders them in place: open the attachment and its Preview replaces the Source view, with a
 "Preview / Source" toggle and an "Open in new tab" button next to the download button.
 
 Built with `pnpm --filter jira-attachment-preview build`; load
@@ -9,25 +9,29 @@ Built with `pnpm --filter jira-attachment-preview build`; load
 
 ## Code map
 
-| File                                                             | Role                                                                              |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `src/content.ts`, `src/preview-controller.ts`                    | Content script: watches the viewer, loads the file, frames the Preview, toggle.   |
-| `src/viewer.ts`                                                  | Attachment viewer DOM: file name and size, controls, Preview host, cleanup.       |
-| `src/page.ts`, `src/editor-source.ts`                            | Page-world script that hands the viewer editor's full text to the content script. |
-| `src/rest-source.ts`                                             | Fallback: finds and downloads the attachment through Jira's REST API.             |
-| `src/file-type.ts`                                               | Supported extensions, displayed-size parsing, the 5 MB limit.                     |
-| `src/selectors.ts`                                               | Jira attachment viewer selectors shared by both worlds.                           |
-| `src/preview.ts`, `src/preview-render.ts`, `static/preview.html` | Sandbox page that renders one Preview.                                            |
-| `src/markdown.ts`, `static/preview.css`                          | Markdown to sanitised HTML, code highlighting, Mermaid diagrams, light/dark.      |
-| `src/front-matter.ts`                                            | Splits YAML front matter off a Markdown file.                                     |
-| `src/messages.ts`                                                | Messages between the scripts and pages; frames the preview page.                  |
-| `src/background.ts`, `src/snapshot.ts`                           | Background worker: stores a snapshot and opens the new-tab page.                  |
-| `src/tab.ts`, `src/tab-page.ts`, `static/tab.html`               | New-tab page: shows a snapshot, or says it expired.                               |
+| File                                                                      | Role                                                                              |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/content.ts`, `src/preview-controller.ts`                             | Content script: watches the viewer, loads the file, frames the Preview, toggle.   |
+| `src/viewer.ts`                                                           | Attachment viewer DOM: file name and size, controls, Preview host, cleanup.       |
+| `src/page.ts`, `src/editor-source.ts`                                     | Page-world script that hands the viewer editor's full text to the content script. |
+| `src/rest-source.ts`                                                      | Fallback: finds and downloads the attachment through Jira's REST API.             |
+| `src/file-type.ts`                                                        | Supported extensions, displayed-size parsing, the 5 MB limit.                     |
+| `src/selectors.ts`                                                        | Jira attachment viewer selectors shared by both worlds.                           |
+| `src/preview.ts`, `src/preview-render.ts`, `static/preview.html`          | Sandbox page that renders one Preview.                                            |
+| `src/markdown.ts`, `static/preview.css`                                   | Markdown to sanitised HTML, code highlighting, Mermaid diagrams, light/dark.      |
+| `src/front-matter.ts`                                                     | Splits YAML front matter off a Markdown file.                                     |
+| `src/excalidraw.ts`, `src/excalidraw-render.ts`, `static/excalidraw.html` | Sandbox page that draws one Excalidraw Preview with `@excalidraw/utils`.          |
+| `src/excalidraw-scene.ts`                                                 | Reads and validates an Excalidraw file's scene.                                   |
+| `src/canvas.ts`, `src/canvas-view.ts`, `static/excalidraw.css`            | The Canvas: pan, zoom and the zoom control.                                       |
+| `src/messages.ts`                                                         | Messages between the scripts and pages; frames the preview page.                  |
+| `src/background.ts`, `src/snapshot.ts`                                    | Background worker: stores a snapshot and opens the new-tab page.                  |
+| `src/tab.ts`, `src/tab-page.ts`, `static/tab.html`                        | New-tab page: shows a snapshot, or says it expired.                               |
 
 ## How it works
 
 1. The content script watches Jira pages on `*.atlassian.net` for the attachment viewer. When it
-   shows a file whose name ends in `.html`, `.htm`, `.md` or `.markdown` (any case), it adds the
+   shows a file whose name ends in `.html`, `.htm`, `.md`, `.markdown`, `.excalidraw` or
+   `.excalidraw.json` (any case), it adds the
    controls and starts loading from a content source. Other files are left alone; SVG is
    already rendered by Jira.
 2. The content comes from the viewer's own code editor: Jira keeps the whole file in memory but
@@ -42,7 +46,14 @@ Built with `pnpm --filter jira-attachment-preview build`; load
    - Markdown is rendered as GitHub-flavoured Markdown with highlighted code blocks and Mermaid
      diagrams. A YAML front matter block (`---` at the top) shows as a key/value table, or as
      highlighted YAML when it is nested, all bundled in the extension. Embedded HTML is sanitised with DOMPurify, so only
-     the renderer runs scripts. It follows Jira's light or dark theme.
+     the renderer runs scripts. It follows Jira's light or dark theme;
+   - Excalidraw is drawn to SVG with `@excalidraw/utils` in its own sandbox page,
+     `excalidraw.html`, and shown on a Canvas: it opens zoomed to fit, the wheel pans,
+     Ctrl/⌘ + wheel or a pinch zooms around the pointer (10%–3000%), dragging pans, and the
+     bottom-left control has −, the zoom (click for 100%), + and Fit. It follows Jira's theme
+     (Excalidraw's dark mode, or the file's background in light), with the fonts bundled and
+     embedded images inline, so it makes no network request. A file that is not JSON with
+     `"type": "excalidraw"` keeps the Source view with "not a valid Excalidraw file".
 4. "Source" hides the Preview and shows Jira's view unchanged. "Open in new tab" stores a
    snapshot in `chrome.storage.session` and opens it in an extension page.
 5. If the file cannot be loaded or is larger than 5 MB, Jira's Source view stays and the reason
@@ -75,3 +86,7 @@ Nothing leaves the browser: the file is read from the page or from the same Jira
 - Reading the editor depends on a Jira internal (CodeMirror's `cmView`); if Jira changes it, the
   REST fallback takes over.
 - The new-tab Preview is a snapshot and expires when the browser closes.
+- Excalidraw Previews are view only: element links are not clickable and embeds (YouTube etc.)
+  show Excalidraw's placeholder. Obsidian's `.excalidraw.md` stays a Markdown Preview, and
+  `.excalidraw.svg`/`.png` are left to Jira. The Excalidraw page bundles ~19 MB (renderer and
+  fonts), loaded only for drawings.

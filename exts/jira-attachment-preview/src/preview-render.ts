@@ -1,5 +1,5 @@
 // Renders one Preview sent by the parent of the sandbox page: an HTML file replaces the page;
-// Markdown is rendered into it.
+// Markdown is rendered into it. The listener is shared with the Excalidraw page.
 import { type MermaidApi, markdownToSafeHtml, renderMermaidBlocks } from "./markdown";
 import { isRenderMessage, READY_TYPE, type RenderMessage } from "./messages";
 
@@ -23,12 +23,15 @@ export async function applyRender(
   await renderMermaidBlocks(article, message.theme, mermaidApi);
 }
 
-/** Waits for the parent's single render message, then renders it. */
-export function listenForRender(win: Window, mermaidApi: MermaidApi): void {
+/** Waits for the parent's single render message, then hands it to `render`. */
+export function listenForRender(
+  win: Window,
+  render: (doc: Document, message: RenderMessage) => Promise<void>,
+): void {
   const onMessage = (event: MessageEvent): void => {
     if (event.source !== win.parent || !isRenderMessage(event.data)) return;
     win.removeEventListener("message", onMessage);
-    void applyRender(win.document, event.data, mermaidApi);
+    void render(win.document, event.data);
   };
   win.addEventListener("message", onMessage);
   win.parent.postMessage({ type: READY_TYPE }, "*");

@@ -5,6 +5,7 @@ import {
   matchesDisplayedSize,
   parseDisplayedSize,
   previewKind,
+  previewPage,
 } from "../src/file-type";
 
 describe("previewKind", () => {
@@ -13,16 +14,35 @@ describe("previewKind", () => {
     ["page.HTM", "html"],
     ["notes.md", "markdown"],
     ["README.Markdown", "markdown"],
+    ["flow.excalidraw", "excalidraw"],
+    ["Flow.EXCALIDRAW", "excalidraw"],
+    ["flow.excalidraw.json", "excalidraw"],
+    ["Flow.Excalidraw.JSON", "excalidraw"],
+    ["drawing.excalidraw.md", "markdown"],
   ])("maps %s to %s", (name, kind) => {
     expect(previewKind(name)).toBe(kind);
   });
 
-  it.each(["logo.svg", "Makefile", "page.html.txt", "notes.mdx", ""])(
-    "leaves %s unsupported",
-    (name) => {
-      expect(previewKind(name)).toBeNull();
-    },
-  );
+  it.each([
+    "logo.svg",
+    "Makefile",
+    "page.html.txt",
+    "notes.mdx",
+    "",
+    "notes.json",
+    "drawing.excalidraw.svg",
+    "drawing.excalidraw.png",
+  ])("leaves %s unsupported", (name) => {
+    expect(previewKind(name)).toBeNull();
+  });
+});
+
+describe("previewPage", () => {
+  it("renders drawings in the Excalidraw page and the rest in the preview page", () => {
+    expect(previewPage("excalidraw")).toBe("excalidraw.html");
+    expect(previewPage("html")).toBe("preview.html");
+    expect(previewPage("markdown")).toBe("preview.html");
+  });
 });
 
 describe("parseDisplayedSize", () => {

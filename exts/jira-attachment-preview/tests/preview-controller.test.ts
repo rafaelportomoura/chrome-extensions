@@ -13,7 +13,7 @@ function deps(overrides: Partial<ControllerDeps> = {}): ControllerDeps {
     pageUrl: () => "https://example.atlassian.net/browse/S-1",
     requestEditorText: vi.fn(async () => EDITOR_TEXT),
     fetchAttachmentText: vi.fn(async () => "<p>from rest</p>"),
-    previewUrl: "about:blank",
+    previewUrl: (kind) => `about:blank#${kind}`,
     sendMessage: vi.fn(async () => undefined),
     ...overrides,
   };
@@ -44,6 +44,30 @@ describe("PreviewController", () => {
     expect(host()?.querySelector("iframe")?.getAttribute("sandbox")).toBe("allow-scripts");
     expect(host()?.hidden).toBe(false);
     expect(d.fetchAttachmentText).not.toHaveBeenCalled();
+  });
+
+  it("frames the Excalidraw page for a valid drawing", async () => {
+    openViewer("flow.excalidraw", "excalidraw · 1 KB");
+    const scene = JSON.stringify({ type: "excalidraw", elements: [] });
+    const d = deps({ requestEditorText: vi.fn(async () => scene.padEnd(1024, " ")) });
+    const controller = new PreviewController(d);
+    await controller.show(current());
+    expect(host()?.querySelector("iframe")?.getAttribute("src")).toBe("about:blank#excalidraw");
+    click("Source");
+    expect(host()?.hidden).toBe(true);
+    click("Open in new tab");
+    expect(d.sendMessage).toHaveBeenCalledWith({
+      type: "jira-attachment-preview:open-tab",
+      snapshot: expect.objectContaining({ fileName: "flow.excalidraw", kind: "excalidraw" }),
+    });
+  });
+
+  it("keeps the Source view for a file that is not an Excalidraw scene", async () => {
+    openViewer("flow.excalidraw.json", "json · 1 KB");
+    const d = deps({ requestEditorText: vi.fn(async () => "{}".padEnd(1024, " ")) });
+    await new PreviewController(d).show(current());
+    expect(status()).toBe("not a valid Excalidraw file");
+    expect(host()).toBeNull();
   });
 
   it("toggles between Source and Preview", async () => {

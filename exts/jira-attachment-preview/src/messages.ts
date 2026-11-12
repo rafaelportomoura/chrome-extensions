@@ -36,7 +36,7 @@ export function isRenderMessage(data: unknown): data is RenderMessage {
   const message = data as Partial<RenderMessage>;
   return (
     message.type === RENDER_TYPE &&
-    (message.kind === "html" || message.kind === "markdown") &&
+    (message.kind === "html" || message.kind === "markdown" || message.kind === "excalidraw") &&
     typeof message.content === "string" &&
     (message.theme === "light" || message.theme === "dark")
   );

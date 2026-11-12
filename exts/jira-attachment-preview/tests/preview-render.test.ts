@@ -37,14 +37,14 @@ describe("applyRender", () => {
 describe("listenForRender", () => {
   it("announces readiness and renders the parent's message", async () => {
     const post = vi.spyOn(window.parent, "postMessage");
-    listenForRender(window, mermaid);
+    listenForRender(window, (doc, m) => applyRender(doc, m, mermaid));
     expect(post).toHaveBeenCalledWith({ type: "jira-attachment-preview:ready" }, "*");
     window.dispatchEvent(new MessageEvent("message", { data: message({}), source: window.parent }));
     await vi.waitFor(() => expect(document.querySelector(".markdown-body")).not.toBeNull());
   });
 
   it("ignores malformed messages", () => {
-    listenForRender(window, mermaid);
+    listenForRender(window, (doc, m) => applyRender(doc, m, mermaid));
     window.dispatchEvent(
       new MessageEvent("message", { data: { type: RENDER_TYPE, kind: "exe" }, source: window }),
     );

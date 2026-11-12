@@ -1,5 +1,7 @@
 // Drives one attachment viewer: decides whether a file gets a Preview, loads its content, frames
 // the sandboxed preview page and handles the toggle.
+
+import { INVALID_EXCALIDRAW_REASON, parseScene } from "./excalidraw-scene";
 import {
   byteLength,
   type DisplayedSize,
@@ -27,7 +29,8 @@ export interface ControllerDeps {
   pageUrl(): string;
   requestEditorText(win: Window): Promise<string | null>;
   fetchAttachmentText(input: RestSourceInput): Promise<string>;
-  previewUrl: string;
+  /** The URL of the sandbox page that renders a Preview kind. */
+  previewUrl(kind: PreviewKind): string;
   sendMessage(message: OpenTabMessage): Promise<unknown>;
 }
 
@@ -77,11 +80,14 @@ export class PreviewController {
     try {
       const content = await this.loadContent(file, generation);
       if (generation !== this.generation) return;
+      if (kind === "excalidraw" && !parseScene(content)) {
+        throw new PreviewError(INVALID_EXCALIDRAW_REASON);
+      }
       const payload = this.payload(file, kind, content);
       this.lastPayload = payload;
       const host = mountPreviewHost(file);
       this.host = host;
-      framePreview(host, payload, this.deps.previewUrl);
+      framePreview(host, payload, this.deps.previewUrl(kind));
       controls.setState("preview");
       log("preview shown", file.name);
     } catch (error) {
