@@ -1,12 +1,12 @@
-// Runs on the PIP web app. Clicks "Sign in with Microsoft" once per flow and ends the flow
-// when the tab is back in the app.
+// Runs on the PIP web app for the page's whole lifetime, since the app is an SPA: a logout or
+// an expired session reaches the sign-in route without a page load. Clicks
+// "Sign in with Microsoft" once per flow and ends the flow when the tab is back in the app.
 import { click } from "./dom";
 import { log } from "./log";
 import { type FlowStatus, sendMessage } from "./messages";
 import { findSignInButton, isAuthPath, nextPipStep } from "./pip-page";
 import { loadSettings } from "./settings";
 
-const MAX_RUNTIME_MS = 60 * 1000;
 const POLL_MS = 500;
 
 async function isFlowActive(): Promise<boolean> {
@@ -19,18 +19,21 @@ async function main(): Promise<void> {
   if (!settings.enabled) return;
 
   const ctx = { doc: document, clicked: new WeakSet<Element>() };
-  const startedAt = Date.now();
+  /** Since when the tab has been in the app, outside the sign-in routes, without the button. */
   let outsideSince: number | undefined;
+  /** Whether this stretch outside the sign-in routes already ended the flow. */
+  let finished = false;
   let busy = false;
-  let timer: ReturnType<typeof setInterval> | undefined;
-  const stop = (): void => clearInterval(timer);
 
   const tick = async (): Promise<void> => {
     const now = Date.now();
-    if (now - startedAt > MAX_RUNTIME_MS) return stop();
     const button = findSignInButton(ctx);
-    if (button || isAuthPath(location.pathname)) outsideSince = undefined;
-    else outsideSince ??= now;
+    if (button || isAuthPath(location.pathname)) {
+      outsideSince = undefined;
+      finished = false;
+    } else {
+      outsideSince ??= now;
+    }
 
     const step = await nextPipStep({
       hasButton: button !== undefined,
@@ -39,29 +42,22 @@ async function main(): Promise<void> {
       outsideSince,
       now,
     });
-    switch (step) {
-      case "click":
-        if (!button) return;
-        stop();
-        await sendMessage({ type: "markFlow" });
-        log("clicking", button.textContent?.trim());
-        click(ctx, button);
-        return;
-      case "blocked":
-        stop();
-        log("sign-in page is back while a flow is active; leaving it to the user");
-        return;
-      case "finished":
-        stop();
-        if (await isFlowActive()) log("back in PIP, flow finished");
-        await sendMessage({ type: "flowFinished" });
-        return;
-      case "wait":
-        return;
+    if (step === "click" && button) {
+      await sendMessage({ type: "markFlow" });
+      log("clicking", button.textContent?.trim());
+      click(ctx, button);
+    } else if (step === "blocked" && button) {
+      // Never looked at again; a re-rendered button is checked afresh.
+      ctx.clicked.add(button);
+      log("sign-in page is back while a flow is active; leaving it to the user");
+    } else if (step === "finished" && !finished) {
+      finished = true;
+      if (await isFlowActive()) log("back in PIP, flow finished");
+      await sendMessage({ type: "flowFinished" });
     }
   };
 
-  timer = setInterval(() => {
+  setInterval(() => {
     if (busy) return;
     busy = true;
     void tick().finally(() => {

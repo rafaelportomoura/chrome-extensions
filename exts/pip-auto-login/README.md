@@ -22,8 +22,10 @@ Built with `pnpm --filter pip-auto-login build`; load `exts/pip-auto-login/dist`
 ## How it works
 
 1. A content script runs on the PIP sites: `web.dev-pip.internal`, `web.uat-pip.internal` and
-   `web.pip.internal`, fixed in the manifest. When a page shows the "Sign in with Microsoft"
-   button (found by its text, on any route), it marks the tab as an active flow and clicks it.
+   `web.pip.internal`, fixed in the manifest. It watches the page for as long as it is open,
+   since PIP is an SPA: a logout or an expired session reaches the sign-in route without a page
+   load. When the page shows the "Sign in with Microsoft" button (found by its text, on any
+   route), it marks the tab as an active flow and clicks it.
 2. If the button shows again while the tab's flow is active, the sign-in most likely failed:
    the extension stops and leaves the click to the user instead of looping.
 3. On `login.microsoftonline.com` it acts only when the URL carries the configured tenant and,
@@ -31,7 +33,7 @@ Built with `pnpm --filter pip-auto-login build`; load `exts/pip-auto-login/dist`
    (5 minutes from the last marked page). PIP asks Microsoft with `prompt=select_account`, so
    the account chooser shows on every sign-in.
 4. On the chooser it picks the preferred account; on "Stay signed in?" it clicks Yes. Labels
-   are matched in English and Portuguese. It stops after 60 seconds on a page.
+   are matched in English and Portuguese. It stops after 60 seconds on a Microsoft page.
 5. Once the tab has stayed in PIP outside the `/auth` routes for 5 seconds, the flow ends. The
    tab stays open.
 
@@ -47,7 +49,12 @@ Open them from the toolbar icon or the extension's options page. They sync acros
 | Preferred account   | `@patria.com`                          | An email, or an `@domain` exactly one chooser account must match. Empty: pick only a single account. |
 | Microsoft tenant ID | `60367fa4-9ea6-46cb-8d81-c9698bb7db3a` | Tenant whose sign-in the extension may complete.                                                     |
 | Filter by client ID | on                                     | On: the sign-in must also carry an allowed client ID. Off: the tenant is enough.                     |
-| Allowed client IDs  | `3185aa47-2c41-4cac-9a92-f23a8f3f6c65` | Client IDs (the PIP web app) whose sign-in the extension may complete.                               |
+| Allowed client IDs  | dev and UAT PIP client IDs (below)     | Client IDs whose sign-in the extension may complete.                                                 |
+
+Default allowed client IDs (the PIP web app):
+
+- `3185aa47-2c41-4cac-9a92-f23a8f3f6c65` (dev)
+- `9bfded1c-44af-4a01-b6d6-96be3634d2f9` (UAT)
 
 ## Limitations
 

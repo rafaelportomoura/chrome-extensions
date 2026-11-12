@@ -19,8 +19,10 @@ export const DEFAULT_SETTINGS: Settings = {
   tenantId: "60367fa4-9ea6-46cb-8d81-c9698bb7db3a",
   filterByClientId: true,
   allowedClientIds: [
-    // PIP web app
+    // PIP web app, dev
     "3185aa47-2c41-4cac-9a92-f23a8f3f6c65",
+    // PIP web app, UAT
+    "9bfded1c-44af-4a01-b6d6-96be3634d2f9",
   ],
 };
 

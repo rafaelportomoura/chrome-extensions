@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PIP Auto login",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Signs in to PIP through Microsoft SSO: clicks Sign in with Microsoft, picks the account and confirms Stay signed in.",
   "permissions": ["storage"],
   "background": {
