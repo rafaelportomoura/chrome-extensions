@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "PIP Auto login",
+  "version": "1.0.0",
+  "description": "Signs in to PIP through Microsoft SSO: clicks Sign in with Microsoft, picks the account and confirms Stay signed in.",
+  "permissions": ["storage"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.dev-pip.internal/*",
+        "https://web.uat-pip.internal/*",
+        "https://web.pip.internal/*"
+      ],
+      "js": ["pip.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://login.microsoftonline.com/*"],
+      "js": ["microsoft.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "PIP Auto login",
+    "default_popup": "options.html"
+  }
+}

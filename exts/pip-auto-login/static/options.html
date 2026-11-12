@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PIP Auto login</title>
+    <style>
+      body { font: 14px system-ui, sans-serif; min-width: 380px; padding: 12px 16px; }
+      label { display: block; margin: 12px 0 4px; font-weight: 600; }
+      label.inline { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+      input[type="text"], textarea { width: 100%; box-sizing: border-box; }
+      textarea { height: 64px; font-family: ui-monospace, monospace; font-size: 12px; }
+      small { color: #666; }
+      #status { color: #188038; margin-left: 8px; }
+    </style>
+  </head>
+  <body>
+    <h3>PIP Auto login</h3>
+    <label class="inline"><input type="checkbox" id="enabled" /> Enabled</label>
+
+    <label for="preferredAccount">Preferred account</label>
+    <input type="text" id="preferredAccount" placeholder="you@company.com or @company.com" />
+    <small>An email, or an @domain that exactly one account must match. Empty: only auto-pick when the chooser shows a single account.</small>
+
+    <label for="tenantId">Microsoft tenant ID</label>
+    <input type="text" id="tenantId" />
+
+    <label class="inline"><input type="checkbox" id="filterByClientId" /> Filter by client ID</label>
+    <small>Off: any sign-in to the tenant above is completed.</small>
+
+    <label for="allowedClientIds">Allowed client IDs (one per line)</label>
+    <textarea id="allowedClientIds"></textarea>
+
+    <p><button type="button" id="save">Save</button><span id="status"></span></p>
+    <script src="options.js"></script>
+  </body>
+</html>

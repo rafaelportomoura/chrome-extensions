@@ -25,3 +25,4 @@ _Avoid_: Sideload, dev install
 
 - [GCP Auto login](exts/gcp-auto-login/GLOSSARY.md): signs in through the Google pages opened
   by the gcloud CLI
+- [PIP Auto login](exts/pip-auto-login/GLOSSARY.md): signs in to PIP through Microsoft SSO

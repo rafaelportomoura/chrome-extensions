@@ -5,9 +5,10 @@ locally with Chrome's "Load unpacked"; none is published to the Chrome Web Store
 
 ## Extensions
 
-| Folder                                        | Name           | What it does                                                                                                       |
-| --------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [`exts/gcp-auto-login`](exts/gcp-auto-login/) | GCP Auto login | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`. |
+| Folder                                        | Name           | What it does                                                                                                           |
+| --------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [`exts/gcp-auto-login`](exts/gcp-auto-login/) | GCP Auto login | Clicks through the Google sign-in pages opened by `gcloud auth login` and `gcloud auth application-default login`.     |
+| [`exts/pip-auto-login`](exts/pip-auto-login/) | PIP Auto login | Signs in to PIP through Microsoft SSO: clicks "Sign in with Microsoft", picks the account, confirms "Stay signed in?". |
 
 Each extension folder has its own `README.md` (how it works, settings, limitations),
 `GLOSSARY.md` and `DESCRIPTION.md` (what it is, for sharing).
