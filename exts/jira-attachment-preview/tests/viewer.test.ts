@@ -95,6 +95,18 @@ describe("mountControls", () => {
   });
 });
 
+describe("mountPreviewHost", () => {
+  it("makes a static viewer positioned and cleanup restores it", () => {
+    openViewer();
+    const file = readViewer(document);
+    if (!file) throw new Error("no viewer");
+    mountPreviewHost(file);
+    expect(file.viewer.style.position).toBe("relative");
+    removeAdded(document);
+    expect(file.viewer.style.position).toBe("");
+  });
+});
+
 describe("removeAdded", () => {
   it("removes the controls and the preview host", () => {
     openViewer();

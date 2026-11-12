@@ -20,7 +20,8 @@ export async function openSnapshotTab(snapshot: PreviewPayload): Promise<void> {
   const item = { [`${KEY_PREFIX}${id}`]: snapshot };
   try {
     await chrome.storage.session.set(item);
-  } catch {
+  } catch (error) {
+    if (!/quota/i.test(String(error))) throw error;
     await clearSnapshots();
     await chrome.storage.session.set(item);
   }

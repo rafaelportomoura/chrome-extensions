@@ -31,6 +31,10 @@ export interface ControllerDeps {
   sendMessage(message: OpenTabMessage): Promise<unknown>;
 }
 
+/** How often, and how long, to wait for the editor to drop the previous file after a switch. */
+const STALE_RETRY_MS = 250;
+const STALE_RETRIES = 6;
+
 export function jiraTheme(doc: Document): Theme {
   return doc.documentElement.dataset.colorMode === "dark" ? "dark" : "light";
 }
@@ -40,6 +44,8 @@ export class PreviewController {
   private controls: Controls | null = null;
   private host: HTMLElement | null = null;
   private lastPayload: PreviewPayload | null = null;
+  /** The editor text used for the previous file, to spot an editor that has not switched yet. */
+  private previousEditorText: string | null = null;
 
   constructor(private readonly deps: ControllerDeps) {}
 
@@ -69,7 +75,7 @@ export class PreviewController {
     controls.setState("loading");
 
     try {
-      const content = await this.loadContent(file);
+      const content = await this.loadContent(file, generation);
       if (generation !== this.generation) return;
       const payload = this.payload(file, kind, content);
       this.lastPayload = payload;
@@ -87,13 +93,13 @@ export class PreviewController {
     }
   }
 
-  private async loadContent(file: ViewerFile): Promise<string> {
+  private async loadContent(file: ViewerFile, generation: number): Promise<string> {
     const displayed = parseDisplayedSize(file.sizeText);
     if (displayed && displayed.bytes - displayed.unit / 2 > MAX_PREVIEW_BYTES) {
       throw new PreviewError(TOO_LARGE_REASON);
     }
     const content =
-      (await this.editorText(displayed)) ??
+      (await this.editorText(displayed, generation)) ??
       (await this.deps.fetchAttachmentText({
         pageUrl: this.deps.pageUrl(),
         fileName: file.name,
@@ -104,15 +110,35 @@ export class PreviewController {
   }
 
   /**
-   * The editor's text, or null when there is none or when its size does not match the size the
-   * viewer shows: right after a file switch the editor may still hold the previous file.
+   * The editor's text, or null when there is none or it still holds the previous file. Right
+   * after a file switch Jira may not have replaced the editor yet: its text is then the previous
+   * file's (waited out, then given up on) or has a size other than the one the viewer shows.
    */
-  private async editorText(displayed: DisplayedSize | null): Promise<string | null> {
-    const text = await this.deps.requestEditorText(this.deps.win);
-    if (text === null || displayed === null) return text;
-    if (matchesDisplayedSize(byteLength(text), displayed)) return text;
-    log("editor text does not match the displayed size; using Jira REST");
-    return null;
+  private async editorText(
+    displayed: DisplayedSize | null,
+    generation: number,
+  ): Promise<string | null> {
+    let text = await this.deps.requestEditorText(this.deps.win);
+    for (
+      let retry = 0;
+      text !== null && text === this.previousEditorText && retry < STALE_RETRIES;
+      retry++
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, STALE_RETRY_MS));
+      if (generation !== this.generation) return null;
+      text = await this.deps.requestEditorText(this.deps.win);
+    }
+    if (text === null) return null;
+    if (text === this.previousEditorText) {
+      log("editor still shows the previous file; using Jira REST");
+      return null;
+    }
+    if (displayed !== null && !matchesDisplayedSize(byteLength(text), displayed)) {
+      log("editor text does not match the displayed size; using Jira REST");
+      return null;
+    }
+    this.previousEditorText = text;
+    return text;
   }
 
   private payload(file: ViewerFile, kind: PreviewKind, content: string): PreviewPayload {

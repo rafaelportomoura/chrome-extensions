@@ -4,10 +4,12 @@
 // through window.postMessage, which carries data between the two worlds (CustomEvent details
 // do not reliably cross them).
 
+import { VIEWER_SELECTOR } from "./viewer";
+
 export const REQUEST_TYPE = "jira-attachment-preview:editor-request";
 export const RESPONSE_TYPE = "jira-attachment-preview:editor-response";
 
-const EDITOR_SELECTOR = '[data-testid="media-viewer-popup"] .cm-content';
+const EDITOR_SELECTOR = `${VIEWER_SELECTOR} .cm-content`;
 
 /** How long the page world waits for the editor to appear before answering "no editor". */
 export const EDITOR_WAIT_MS = 1500;

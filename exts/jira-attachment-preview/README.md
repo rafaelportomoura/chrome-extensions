@@ -26,7 +26,8 @@ Built with `pnpm --filter jira-attachment-preview build`; load
 
 1. The content script watches Jira pages on `*.atlassian.net` for the attachment viewer. When it
    shows a file whose name ends in `.html`, `.htm`, `.md` or `.markdown` (any case), it adds the
-   controls and starts loading from a content source. Other files are left alone; SVG is already rendered by Jira.
+   controls and starts loading from a content source. Other files are left alone; SVG is
+   already rendered by Jira.
 2. The content comes from the viewer's own code editor: Jira keeps the whole file in memory but
    draws only the visible lines, so a page-world script reads it and posts it back. When the
    viewer shows no editor, the extension finds the attachment through
@@ -65,8 +66,9 @@ Nothing leaves the browser: the file is read from the page or from the same Jira
   from a CDN or compile code in the browser work, and Mermaid's bundled CSV parser needs
   `new Function`. All of it runs in an opaque origin with no access to Jira or the extension.
   Forms and popups are blocked.
-- If the viewer's editor still holds another file (its size does not match the size Jira shows),
-  the extension uses the REST fallback instead.
+- Right after switching files the viewer's editor may still hold the previous file. The extension
+  waits for its text to change and falls back to REST if it does not, or if its size is more than
+  one unit away from the size Jira shows (e.g. "14 KB" accepts 13–15 KB).
 - Reading the editor depends on a Jira internal (CodeMirror's `cmView`); if Jira changes it, the
   REST fallback takes over.
 - The new-tab Preview is a snapshot and expires when the browser closes.

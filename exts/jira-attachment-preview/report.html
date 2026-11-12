@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attachment Preview for Jira mostra HTML e Markdown renderizados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* report-html base styles. Tokens and component rules come from assets/DESIGN.md (Patria Platform).
+   shadcn/ui components are recreated here in plain CSS. No Tailwind, no React. */
+
+:root {
+  --background: #ffffff;
+  --foreground: #202020;
+  --brand-ink: #0d0d38;
+  --card: #ffffff;
+  --primary: #2044dc;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --destructive: #c73232;
+  --border: #e5e5e5;
+  --input: #8c8b97;
+  --ring: #2044dc;
+  --status-positive: #257e47;
+  --status-attention: #c75100;
+  --status-attention-dot: #f97316;
+  --status-idle: #737373;
+  --highlight: color-mix(in oklab, #2044dc 9%, #ffffff);
+  --font-sans: "Host Grotesk", "Segoe UI", Tahoma, sans-serif;
+  --font-mono: "JetBrainsMono NF", "JetBrains Mono", ui-monospace, monospace;
+  --r-sm: 0.25rem;
+  --r-md: 0.375rem;
+  --r-lg: 0.5rem;
+  --shadow-overlay: 0 10px 30px rgb(13 13 56 / 0.18);
+}
+
+/* Nerd Font: one file serves code and icons. Loaded from jsDelivr, pinned version. */
+@font-face {
+  font-family: "JetBrainsMono NF";
+  src: url("https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@v3.4.0/patched-fonts/JetBrainsMono/Ligatures/Regular/JetBrainsMonoNerdFont-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--secondary);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+h1, h2, h3, h4 { color: var(--brand-ink); font-weight: 600; margin: 0; }
+h1 { font-size: 1.375rem; line-height: 1.25; letter-spacing: -0.02em; }
+h2 { font-size: 1.0625rem; line-height: 1.35; letter-spacing: -0.015em; }
+h3 { font-size: 0.9375rem; line-height: 1.4; letter-spacing: -0.01em; }
+p { margin: 0 0 0.75rem; max-width: 70ch; }
+a { color: var(--primary); text-decoration: underline; text-underline-offset: 2px; }
+/* External links always open in a new tab and carry a small marker. The build script sets target and rel. */
+a[target="_blank"]::after { content: "\f08e"; font-family: var(--font-mono); font-size: 0.6875rem; margin-left: 0.3em; text-decoration: none; display: inline-block; }
+a.btn[target="_blank"], .meta a { text-decoration: none; }
+.meta a { color: var(--primary); }
+code, kbd, pre, .mono { font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.55; }
+code { background: var(--secondary); border-radius: var(--r-sm); padding: 0.05rem 0.3rem; }
+pre { background: var(--secondary); border: 1px solid var(--border); border-radius: var(--r-md); padding: 0.75rem 0.875rem; overflow-x: auto; margin: 0.5rem 0 0.75rem; }
+pre code { background: none; padding: 0; }
+kbd { background: var(--card); color: var(--muted-foreground); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 0.05rem 0.3rem; }
+ul, ol { margin: 0 0 0.75rem; padding-left: 1.25rem; }
+li { margin: 0.2rem 0; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tnum, td, th { font-variant-numeric: tabular-nums; }
+
+/* Icons (Nerd Font glyphs). Always next to a text label. */
+.ic { font-family: var(--font-mono); font-style: normal; font-weight: 400; display: inline-block; width: 1.1em; text-align: center; margin-right: 0.3em; color: var(--muted-foreground); }
+.ic-text { font-family: var(--font-mono); fill: var(--muted-foreground); font-size: 13px; }
+
+/* Eyebrow, meta */
+.eyebrow { color: var(--muted-foreground); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.45; margin: 0 0 0.5rem; max-width: none; }
+.meta { display: flex; flex-wrap: wrap; gap: 0.5rem 0.875rem; align-items: center; color: var(--muted-foreground); font-size: 0.8125rem; margin: 0.75rem 0 0; }
+
+/* Badge (shadcn Badge) */
+.badge { display: inline-flex; align-items: center; height: 1.25rem; padding: 0 0.45rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.04em; line-height: 1; white-space: nowrap; }
+.badge.default { background: var(--primary); color: var(--primary-foreground); }
+.badge.secondary { background: var(--secondary); color: var(--secondary-foreground); }
+.badge.outline { border: 1px solid var(--border); color: var(--muted-foreground); }
+
+/* Status: dot + label. Status color is not the accent. */
+.status { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem; color: var(--foreground); }
+.status::before { content: ""; width: 0.4rem; height: 0.4rem; border-radius: 999px; background: var(--status-idle); }
+.status.positive { color: var(--status-positive); } .status.positive::before { background: var(--status-positive); }
+.status.attention { color: var(--status-attention); } .status.attention::before { background: var(--status-attention-dot); }
+.status.negative { color: var(--foreground); } .status.negative::before { background: var(--destructive); }
+.status.idle { color: var(--status-idle); }
+
+/* Card (shadcn Card): a block inside a page, never around the main collection */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1rem; }
+.card h3 { margin: 0 0 0.25rem; }
+.card p:last-child { margin-bottom: 0; }
+.card .desc { color: var(--muted-foreground); font-size: 0.8125rem; line-height: 1.5; }
+.grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin: 0.75rem 0; }
+
+/* Summary: the first thing the reader sees */
+.summary { background: var(--highlight); border-radius: var(--r-lg); padding: 0.875rem 1rem; margin: 1.25rem 0 0; font-size: 1rem; line-height: 1.55; color: var(--brand-ink); }
+.summary p { margin: 0; max-width: none; }
+
+/* Key points */
+.key-points { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.5rem; }
+/* The marker is positioned absolutely, so inline children (<code>, <a>, <strong>) stay in the text flow.
+   Never make the li a grid or flex container: each inline child would become its own item. */
+.key-points li { position: relative; padding-left: 1.6rem; margin: 0; line-height: 1.5; }
+.key-points li::before { content: "\f00c"; position: absolute; left: 0; top: 0.1em; font-family: var(--font-mono); color: var(--primary); font-size: 0.75rem; }
+.key-points.attention li::before { content: "\f071"; color: var(--status-attention); }
+
+/* Sections */
+.section { margin-top: 1.75rem; }
+.section > h2 { padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); margin-bottom: 0.75rem; }
+
+/* Table (flush, hairline rules) */
+.table-wrap { overflow-x: auto; margin: 0.5rem 0 0.75rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.8125rem; line-height: 1.5; }
+th { text-align: left; font-weight: 500; color: var(--muted-foreground); padding: 0.55rem 0.625rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 0.625rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:hover { background: var(--secondary); }
+td.num, th.num { text-align: right; }
+.add { color: var(--status-positive); } .del { color: var(--destructive); }
+
+/* Accordion (shadcn Accordion) on native <details>. Closed by default. */
+.accordion { border-top: 1px solid var(--border); margin: 0.5rem 0 0.75rem; }
+.accordion details { border-bottom: 1px solid var(--border); }
+/* Block layout with an absolute marker: inline children (<code>, <a>) in a title stay in the text flow. */
+.accordion summary { list-style: none; cursor: pointer; position: relative; display: block; padding: 0.75rem 0.25rem 0.75rem 1.7rem; font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; color: var(--brand-ink); border-radius: var(--r-md); }
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary::before { content: "\f054"; position: absolute; left: 0.5rem; top: 0.95rem; font-family: var(--font-mono); font-weight: 400; font-size: 0.6875rem; color: var(--muted-foreground); transition: transform 0.15s; }
+.accordion details[open] > summary::before { transform: rotate(90deg); }
+.accordion summary:hover { background: var(--secondary); }
+.accordion summary .tail { float: right; margin-left: 0.75rem; font-weight: 400; font-size: 0.75rem; color: var(--muted-foreground); font-family: var(--font-mono); }
+.accordion summary code { font-weight: 500; }
+.accordion .body { padding: 0.25rem 0.25rem 1rem 1.55rem; }
+.toolbar { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; height: 2rem; padding: 0 0.75rem; border-radius: var(--r-md); border: 1px solid var(--border); background: var(--card); color: var(--foreground); font: inherit; font-size: 0.8125rem; cursor: pointer; }
+.btn:hover { background: var(--secondary); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
+.btn.ghost { border-color: transparent; background: none; color: var(--secondary-foreground); }
+.btn.ghost:hover { background: var(--secondary); }
+.link-detail { background: none; border: 0; padding: 0; font: inherit; color: var(--primary); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+
+/* Dialog (shadcn Dialog) on native <dialog>. The only thing with a shadow. */
+dialog#detail { border: 1px solid var(--border); border-radius: var(--r-lg); padding: 0; width: min(36rem, calc(100vw - 2rem)); max-height: calc(100vh - 4rem); background: var(--card); color: var(--foreground); box-shadow: var(--shadow-overlay); }
+dialog#detail.wide { width: min(54rem, calc(100vw - 2rem)); }
+dialog#detail::backdrop { background: rgb(13 13 56 / 0.35); }
+dialog#detail .dlg-head { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1.25rem 1.25rem 0.75rem; }
+dialog#detail .dlg-head h3 { font-size: 1.0625rem; flex: 1; }
+dialog#detail .dlg-body { padding: 0 1.25rem 1.25rem; overflow-y: auto; max-height: calc(100vh - 11rem); font-size: 0.875rem; line-height: 1.6; }
+dialog#detail .dlg-body > :last-child { margin-bottom: 0; }
+dialog#detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0 0 0.75rem; font-size: 0.8125rem; }
+dialog#detail dt { color: var(--muted-foreground); }
+dialog#detail dd { margin: 0; }
+template { display: none; }
+/* JSON bodies: technical view in a modal. Colors come from tokens, one accent for literals. */
+dialog#detail pre.json { position: relative; overflow-x: auto; font-size: 0.75rem; line-height: 1.6; padding-right: 4.5rem; }
+pre.json .k { color: var(--brand-ink); font-weight: 500; }
+pre.json .n, pre.json .b { color: var(--primary); }
+pre.json .z { color: var(--muted-foreground); }
+pre.json .s { color: var(--foreground); }
+.copy { position: absolute; top: 0.4rem; right: 0.4rem; height: 1.5rem; padding: 0 0.5rem; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--card); color: var(--muted-foreground); font: inherit; font-size: 0.6875rem; cursor: pointer; }
+.copy:hover { background: var(--secondary); color: var(--foreground); }
+.body-link { display: inline-flex; align-items: center; gap: 0.4rem; height: 1.75rem; padding: 0 0.625rem; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--card); color: var(--primary); font: inherit; font-size: 0.8125rem; cursor: pointer; }
+.body-link:hover { background: var(--highlight); }
+.body-link .ct { color: var(--muted-foreground); font-family: var(--font-mono); font-size: 0.6875rem; }
+.body-link::before { content: "{ }"; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted-foreground); }
+
+/* SVG diagrams. Nodes with data-detail are clickable and open the dialog. */
+figure.diagram { margin: 0.75rem 0 1rem; border: 1px solid var(--border); border-radius: var(--r-lg); padding: 0.75rem; background: var(--card); }
+figure.diagram svg { display: block; width: 100%; height: auto; }
+figure.diagram figcaption { color: var(--muted-foreground); font-size: 0.75rem; line-height: 1.45; margin-top: 0.5rem; }
+/* Infinite canvas: every report diagram pans and zooms in place; "Ampliar" opens it full screen. */
+figure.diagram .canvas-tools { display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; margin: -0.25rem -0.25rem 0.5rem; }
+figure.diagram .canvas-tools .btn { height: 1.75rem; padding: 0 0.5rem; font-size: 0.75rem; }
+figure.diagram .canvas-tools .zoom-level { min-width: 2.75rem; text-align: center; font-size: 0.75rem; color: var(--muted-foreground); }
+figure.diagram .canvas-tools.float { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 1; margin: 0; }
+figure.diagram .canvas-tools.float .btn { background: var(--card); }
+.slide figure.diagram { position: relative; }
+figure.diagram .canvas { position: relative; overflow: hidden; cursor: grab; touch-action: pan-y; user-select: none; border-radius: var(--r-md); background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 16px 16px; }
+figure.diagram .canvas:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+figure.diagram .canvas.dragging { cursor: grabbing; }
+figure.diagram .canvas svg { display: block; width: 100%; height: 100%; }
+figure.diagram .canvas-hint { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0.375rem 0.75rem; border-radius: var(--r-md); background: rgb(13 13 56 / 0.75); color: #fff; font-size: 0.8125rem; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+figure.diagram .canvas.hinting .canvas-hint { opacity: 1; }
+dialog.zoom { width: calc(100vw - 2rem); height: calc(100vh - 2rem); max-width: none; max-height: none; padding: 0; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--card); color: var(--foreground); display: none; flex-direction: column; overflow: hidden; }
+dialog.zoom[open] { display: flex; }
+dialog.zoom::backdrop { background: rgb(13 13 56 / 0.35); }
+dialog.zoom .zoom-head { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+dialog.zoom .zoom-head h3 { font-size: 1.0625rem; flex: 1; margin: 0; }
+dialog.zoom .zoom-hint { color: var(--muted-foreground); font-size: 0.75rem; }
+dialog.zoom .zoom-level { min-width: 3.5rem; text-align: center; font-size: 0.8125rem; color: var(--muted-foreground); }
+dialog.zoom .zoom-canvas { flex: 1; min-height: 0; cursor: grab; touch-action: none; user-select: none; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 16px 16px; }
+dialog.zoom .zoom-canvas.dragging { cursor: grabbing; }
+dialog.zoom .zoom-canvas svg { display: block; width: 100%; height: 100%; }
+@media (max-width: 640px) { dialog.zoom .zoom-hint { display: none; } }
+svg text { font-family: var(--font-sans); font-size: 13px; fill: var(--foreground); }
+svg .mono-text { font-family: var(--font-mono); font-size: 11px; fill: var(--muted-foreground); }
+svg .sub { font-size: 11px; fill: var(--muted-foreground); }
+svg .node rect, svg .node circle, svg .node ellipse, svg .node path.shape { fill: var(--card); stroke: var(--input); stroke-width: 1.25; }
+svg .node.primary rect, svg .node.primary circle { stroke: var(--primary); fill: var(--highlight); stroke-width: 1.75; }
+svg .node.primary text.title { fill: var(--brand-ink); font-weight: 600; }
+svg .node.attention rect, svg .node.attention ellipse { stroke: var(--status-attention-dot); }
+svg .node.primary ellipse { stroke: var(--primary); fill: var(--highlight); stroke-width: 1.75; }
+svg .node.muted rect, svg .node.muted ellipse { fill: var(--secondary); stroke: var(--border); }
+/* Schema diagrams (ER, documents, graph): the diagram holds names only, details open in a modal. */
+svg text.ent { font-family: var(--font-mono); font-size: 12px; font-weight: 600; fill: var(--brand-ink); }
+svg .card-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; fill: var(--foreground); }
+svg .node.embedded rect { fill: var(--secondary); stroke: var(--border); }
+svg .edge.dashed { stroke-dasharray: 5 4; }
+svg .rel { cursor: pointer; }
+svg .rel .hit { stroke: transparent; stroke-width: 16; fill: none; pointer-events: stroke; }
+svg .rel:hover .edge { stroke: var(--primary); stroke-width: 2; }
+svg .rel:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+svg .node text.title { font-weight: 600; fill: var(--brand-ink); }
+svg .group rect { fill: none; stroke: var(--border); stroke-dasharray: 4 3; stroke-width: 1; }
+svg .group text { fill: var(--muted-foreground); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+svg .edge { fill: none; stroke: var(--input); stroke-width: 1.25; }
+svg .edge.primary { stroke: var(--primary); }
+svg .edge-label { font-size: 11px; fill: var(--muted-foreground); paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
+svg marker path { fill: var(--input); }
+svg [data-detail] { cursor: pointer; }
+svg [data-detail]:hover rect, svg [data-detail]:hover circle, svg [data-detail]:hover ellipse { fill: var(--secondary); }
+svg [data-detail].primary:hover rect, svg [data-detail].primary:hover ellipse { fill: var(--highlight); stroke-width: 2.25; }
+svg [data-detail]:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+svg [data-detail] .hint { fill: var(--primary); font-family: var(--font-mono); font-size: 11px; }
+
+/* Contracts (Swagger-like): API routes, commands, jobs, events. Same UI as the rest of the page.
+   Closed by default. The summary row has fixed parts (method, path, text, change), each one a span. */
+.contracts { margin: 0.5rem 0 1rem; display: grid; gap: 0.5rem; }
+.contracts > h3 { font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); margin: 0.75rem 0 0; }
+details.contract { border: 1px solid var(--border); border-left: 3px solid var(--status-idle); border-radius: var(--r-md); background: var(--card); }
+details.contract.get { border-left-color: var(--input); }
+details.contract.post, details.contract.put, details.contract.patch { border-left-color: var(--primary); }
+details.contract.delete { border-left-color: var(--destructive); }
+details.contract > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding: 0.625rem 0.75rem; border-radius: var(--r-md); }
+details.contract > summary::-webkit-details-marker { display: none; }
+details.contract > summary:hover { background: var(--secondary); }
+details.contract > summary::after { content: "\f054"; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted-foreground); margin-left: auto; order: 9; transition: transform 0.15s; }
+details.contract[open] > summary::after { transform: rotate(90deg); }
+.method { display: inline-block; min-width: 3.75rem; text-align: center; padding: 0.2rem 0.5rem; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.3; background: var(--secondary); color: var(--secondary-foreground); border: 1px solid transparent; }
+.method.post, .method.put, .method.patch { background: var(--highlight); color: var(--primary); }
+.method.delete { background: var(--card); border-color: var(--destructive); color: var(--foreground); }
+.method.job, .method.cmd, .method.evt { background: var(--card); border-color: var(--border); color: var(--muted-foreground); }
+.contract .path { background: none; padding: 0; font-family: var(--font-mono); font-size: 0.8125rem; color: var(--brand-ink); font-weight: 500; word-break: break-all; }
+.contract .sum { flex: 1 1 14rem; min-width: 0; font-size: 0.8125rem; color: var(--muted-foreground); line-height: 1.45; }
+.contract .sum code { font-size: 0.6875rem; }
+.contract > .body { padding: 0.25rem 1rem 1rem; border-top: 1px solid var(--border); }
+.contract .body h4 { font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); margin: 1rem 0 0.25rem; }
+.contract .body > p:first-child { margin-top: 0.75rem; }
+.contract table { font-size: 0.8125rem; }
+.contract td:first-child code { font-weight: 500; }
+.contract td.in { color: var(--muted-foreground); white-space: nowrap; }
+.contract td.ind1 { padding-left: 1.5rem; }
+.contract td.ind2 { padding-left: 2.5rem; }
+.contract .req { color: var(--status-attention); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+.resp { display: grid; grid-template-columns: 4.25rem 1fr; gap: 0.25rem 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.8125rem; line-height: 1.5; }
+.resp:last-child { border-bottom: 0; }
+.resp pre { grid-column: 2; margin: 0.25rem 0 0; }
+.code { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600; align-self: start; }
+.code::before { content: ""; width: 0.4rem; height: 0.4rem; border-radius: 999px; background: var(--status-idle); }
+.code.c2::before { background: var(--status-positive); }
+.code.c4::before { background: var(--status-attention-dot); }
+.code.c5::before { background: var(--destructive); }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0.25rem 0 0.5rem; font-size: 0.8125rem; }
+dl.kv dt { color: var(--muted-foreground); }
+dl.kv dd { margin: 0; }
+
+@media print {
+  body { background: #fff; }
+  .toolbar, .btn { display: none; }
+  details { display: block; }
+  details > .body { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Generated from JetBrainsMono Nerd Font v3.4.0. Every codepoint was checked against the font cmap. */
+.ic-file::before{content:"\f0f6"}
+.ic-folder::before{content:"\f114"}
+.ic-branch::before{content:"\f418"}
+.ic-pr::before{content:"\f407"}
+.ic-commit::before{content:"\f417"}
+.ic-merge::before{content:"\f419"}
+.ic-diff::before{content:"\f440"}
+.ic-alert::before{content:"\f071"}
+.ic-check::before{content:"\f00c"}
+.ic-x::before{content:"\f00d"}
+.ic-info::before{content:"\f05a"}
+.ic-database::before{content:"\f1c0"}
+.ic-cloud::before{content:"\f0c2"}
+.ic-user::before{content:"\f007"}
+.ic-users::before{content:"\f0c0"}
+.ic-bolt::before{content:"\f0e7"}
+.ic-lock::before{content:"\f023"}
+.ic-key::before{content:"\f084"}
+.ic-gear::before{content:"\f013"}
+.ic-search::before{content:"\f002"}
+.ic-clock::before{content:"\f017"}
+.ic-calendar::before{content:"\f073"}
+.ic-link::before{content:"\f0c1"}
+.ic-code::before{content:"\f121"}
+.ic-terminal::before{content:"\f489"}
+.ic-bug::before{content:"\f188"}
+.ic-rocket::before{content:"\f135"}
+.ic-flag::before{content:"\f024"}
+.ic-list::before{content:"\f03a"}
+.ic-tag::before{content:"\f02b"}
+.ic-server::before{content:"\f233"}
+.ic-shield::before{content:"\f132"}
+.ic-chevron-right::before{content:"\f054"}
+.ic-arrow-right::before{content:"\f061"}
+.ic-question::before{content:"\f059"}
+.ic-book::before{content:"\f02d"}
+.ic-cube::before{content:"\f1b2"}
+.ic-sitemap::before{content:"\f0e8"}
+.ic-plus::before{content:"\f067"}
+.ic-minus::before{content:"\f068"}
+.ic-test::before{content:"\f0c3"}
+.ic-file-code::before{content:"\f1c9"}
+.ic-expand::before{content:"\f065"}
+.ic-pencil::before{content:"\f040"}
+.ic-trash::before{content:"\f014"}
+.ic-eye::before{content:"\f06e"}
+.ic-refresh::before{content:"\f021"}
+.ic-comment::before{content:"\f0e5"}
+.ic-download::before{content:"\f019"}
+.ic-upload::before{content:"\f093"}
+.ic-play::before{content:"\f04b"}
+.ic-pause::before{content:"\f04c"}
+.ic-github::before{content:"\f09b"}
+.ic-external::before{content:"\f08e"}
+
+/* Layout for kind=report: the "Reading" archetype of DESIGN.md. Grey ground, one white column. */
+.page { padding: 2.5rem 1rem; }
+/* Width: half of the screen, never narrower than 880px (the base width of the SVG diagrams) and never wider than 1400px. */
+.reading { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); width: clamp(880px, 50vw, 1400px); max-width: 100%; margin: 0 auto; padding: 2.25rem 2.5rem; }
+.reading { position: relative; }
+/* Fixed mode: 960px instead of half of the screen. The toggle button sits in the top right corner of the column. */
+.reading.fixed { width: 960px; }
+.width-toggle { position: absolute; top: 0.875rem; right: 0.875rem; display: inline-flex; align-items: center; gap: 0.3rem; height: 1.75rem; padding: 0 0.625rem; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--card); color: var(--muted-foreground); font: inherit; font-size: 0.75rem; cursor: pointer; z-index: 2; }
+.width-toggle:hover { background: var(--secondary); color: var(--foreground); }
+.width-toggle .ic { margin-right: 0; width: 1em; }
+.reading > header { padding-bottom: 0.25rem; padding-right: 9rem; }
+.reading > footer { margin-top: 2rem; padding-top: 0.75rem; border-top: 1px solid var(--border); color: var(--muted-foreground); font-size: 0.75rem; max-width: none; }
+@media (max-width: 920px) { .width-toggle { display: none; } .reading > header { padding-right: 0; } }
+@media (max-width: 40rem) {
+  .page { padding: 0; }
+  .reading { border-radius: 0; border-left: 0; border-right: 0; padding: 1.5rem 1rem; }
+}
+@media print {
+  .width-toggle { display: none; }
+  .page { padding: 0; }
+  .reading { border: 0; max-width: none; padding: 0; }
+}
+
+</style>
+</head>
+<body>
+<main class="page"><article class="reading">
+<button class="width-toggle" type="button" aria-pressed="false" title="Alternar largura do relatório" data-fluid="Largura 50%" data-fixed="Largura 960 px"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">Largura 50%</span></button>
+<!-- report-html:content -->
+<header>
+<p class="eyebrow">Free · chrome-extensions · 12 nov 2026</p>
+<h1>Attachment Preview for Jira mostra HTML e Markdown renderizados</h1>
+<div class="meta"><span class="status positive">Implementada, falta validar no Jira real</span><span>v1.0.0 · Manifest V3</span><code>exts/jira-attachment-preview</code></div>
+</header>
+<div class="summary"><p>Extensão do Chrome que renderiza anexos HTML e Markdown no visualizador de anexos do Jira Cloud, que mostra só o código. Os 78 testes unitários e o e2e no Chromium do Playwright passam. Falta validar numa página real do Jira Cloud.</p></div>
+<ul class="key-points">
+<li>Preview substitui o Source; um botão alterna entre os dois.</li>
+<li>HTML roda em sandbox de origem opaca, sem acesso à página nem aos cookies.</li>
+<li>Markdown tem tabelas, código colorido e Mermaid, tudo empacotado.</li>
+<li>Aceita arquivos de até 5 MB e abre o preview em nova aba.</li>
+</ul>
+<ul class="key-points attention">
+<li>Não verificado com a extensão carregada numa página real do Jira Cloud.</li>
+</ul>
+
+<section class="section"><h2>Para quem é e o que faz</h2>
+<p>Serve a quem revisa protótipos HTML e Markdown anexados a cards sem baixar o arquivo. Atua em arquivos <code>.html</code>, <code>.htm</code>, <code>.md</code> e <code>.markdown</code>; outros arquivos ficam como estão.</p>
+</section>
+
+<section class="section"><h2>Como o conteúdo chega ao preview</h2>
+<figure class="diagram">
+<svg viewBox="0 0 880 394" role="img" aria-label="Fluxo: do visualizador Jira ao preview">
+<defs><marker id="m84fb49" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<g transform="translate(7 0)">
+<path class="edge" d="M152 182 H247" marker-end="url(#m84fb49)"/>
+<text class="edge-label" x="200" y="176" text-anchor="middle">anexo abre</text>
+<path class="edge" d="M383 163 H421 V50 H479" marker-end="url(#m84fb49)"/>
+<text class="edge-label" x="421" y="106" text-anchor="middle">texto</text>
+<path class="edge dashed" d="M383 176 H428 V138 H490" marker-end="url(#m84fb49)"/>
+<text class="edge-label" x="428" y="157" text-anchor="middle">sem editor</text>
+<path class="edge primary" d="M383 188 H435 V226 H490" marker-end="url(#m84fb49)"/>
+<text class="edge-label" x="435" y="207" text-anchor="middle">render</text>
+<path class="edge" d="M383 201 H442 V314 H490" marker-end="url(#m84fb49)"/>
+<text class="edge-label" x="442" y="258" text-anchor="middle">open-tab</text>
+<path class="edge" d="M618 314 H660 V182 H713" marker-end="url(#m84fb49)"/>
+<text class="edge-label" x="660" y="248" text-anchor="middle">snapshot</text>
+<g class="node muted">
+<rect x="24" y="156" width="128" height="52" rx="6"/>
+<text class="title" x="38" y="180">Visualizador</text>
+<text class="sub" x="38" y="198">Jira Cloud</text></g>
+<g class="node primary" data-detail="content" aria-label="Content script: ver detalhe">
+<rect x="247" y="156" width="136" height="52" rx="6"/>
+<text class="title" x="261" y="180">Content script</text>
+<text class="sub" x="261" y="198">isolated world</text></g>
+<g class="node" data-detail="editor" aria-label="Leitor do editor: ver detalhe">
+<rect x="479" y="24" width="151" height="52" rx="6"/>
+<text class="title" x="493" y="48">Leitor do editor</text>
+<text class="sub" x="493" y="66">page world</text></g>
+<g class="node" data-detail="rest" aria-label="REST Jira: ver detalhe">
+<rect x="490" y="112" width="128" height="52" rx="6"/>
+<text class="title" x="504" y="136">REST Jira</text>
+<text class="sub" x="504" y="154">fallback</text></g>
+<g class="node" data-detail="preview" aria-label="preview.html: ver detalhe">
+<rect x="490" y="200" width="128" height="52" rx="6"/>
+<text class="title" x="504" y="224">preview.html</text>
+<text class="sub" x="504" y="242">sandbox</text></g>
+<g class="node" data-detail="bg" aria-label="Background: ver detalhe">
+<rect x="490" y="288" width="128" height="52" rx="6"/>
+<text class="title" x="504" y="312">Background</text>
+<text class="sub" x="504" y="330">service worker</text></g>
+<g class="node" data-detail="tab" aria-label="Nova aba: ver detalhe">
+<rect x="713" y="156" width="128" height="52" rx="6"/>
+<text class="title" x="727" y="180">Nova aba</text>
+<text class="sub" x="727" y="198">tab.html</text></g>
+</g>
+</svg>
+<figcaption>Clique em um bloco para ver o detalhe.</figcaption>
+</figure>
+
+
+<div class="accordion"><details><summary>Sequência completa das mensagens</summary><div class="body"><figure class="diagram">
+<svg viewBox="0 0 920 604" role="img" aria-label="Sequência: abrir um anexo e ver o preview">
+<defs><marker id="m5198d0" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="edge dashed" d="M84 50 V594" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M234 50 V594" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M385 50 V594" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M535 50 V594" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M686 50 V594" stroke-opacity="0.6"/>
+<path class="edge dashed" d="M836 50 V594" stroke-opacity="0.6"/>
+<path class="edge" d="M84 102 H234" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="159" y="95" text-anchor="middle">arquivo .html ou .md</text>
+<path class="edge" d="M234 146 H385" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="310" y="139" text-anchor="middle">editor-request</text>
+<path class="edge dashed" d="M385 190 H234" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="310" y="183" text-anchor="middle">editor-response</text>
+<g class="node muted"><rect x="164" y="218" width="441" height="30" rx="6"/><text class="sub" x="385" y="237" text-anchor="middle">Sem editor, sem texto ou com tamanho diferente do exibido: REST</text></g>
+<path class="edge" d="M234 274 H535" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="385" y="267" text-anchor="middle">GET issue, GET content</text>
+<path class="edge dashed" d="M535 318 H234" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="385" y="311" text-anchor="middle">texto</text>
+<path class="edge" d="M234 362 H686" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="460" y="355" text-anchor="middle">abre o iframe</text>
+<path class="edge dashed" d="M686 406 H234" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="460" y="399" text-anchor="middle">ready</text>
+<path class="edge" d="M234 450 H686" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="460" y="443" text-anchor="middle">render</text>
+<path class="edge" d="M234 494 H836" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="535" y="487" text-anchor="middle">open-tab</text>
+<path class="edge" d="M836 538 H882 V558 H839" marker-end="url(#m5198d0)"/>
+<text class="edge-label" x="959" y="552" text-anchor="middle">grava snapshot, abre aba</text>
+<g class="node">
+<rect x="20" y="10" width="128" height="40" rx="6"/>
+<text class="title" x="34" y="34">Visualizador</text></g>
+<g class="node">
+<rect x="170" y="10" width="128" height="40" rx="6"/>
+<text class="title" x="184" y="34">Content script</text></g>
+<g class="node">
+<rect x="321" y="10" width="128" height="40" rx="6"/>
+<text class="title" x="335" y="34">Page world</text></g>
+<g class="node">
+<rect x="471" y="10" width="128" height="40" rx="6"/>
+<text class="title" x="485" y="34">REST Jira</text></g>
+<g class="node">
+<rect x="622" y="10" width="128" height="40" rx="6"/>
+<text class="title" x="636" y="34">preview.html</text></g>
+<g class="node">
+<rect x="772" y="10" width="128" height="40" rx="6"/>
+<text class="title" x="786" y="34">Background</text></g>
+</svg>
+<figcaption>Clique em um bloco para ver o detalhe.</figcaption>
+</figure>
+</div></details></div></section>
+
+<section class="section"><h2>Quatro estados: carregando, preview, source, erro</h2>
+<figure class="diagram">
+<svg viewBox="0 0 880 194" role="img" aria-label="Estados do preview">
+<defs><marker id="mfcc766" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<g transform="translate(142 0)">
+<path class="edge" d="M152 37 H190 V75 H236" marker-end="url(#mfcc766)"/>
+<text class="edge-label" x="190" y="56" text-anchor="middle">carregou</text>
+<path class="edge" d="M88 64 V100" marker-end="url(#mfcc766)"/>
+<text class="edge-label" x="112" y="82" text-anchor="middle">falhou</text>
+<path class="edge" d="M364 82 H444" marker-end="url(#mfcc766)"/>
+<text class="edge-label" x="404" y="76" text-anchor="middle">Source</text>
+<path class="edge dashed" d="M516 102 V162 H292 V102" marker-end="url(#mfcc766)"/>
+<text class="edge-label" x="404" y="156" text-anchor="middle">Preview</text>
+<g class="node">
+<rect x="24" y="24" width="128" height="40" rx="6"/>
+<text class="title" x="38" y="48">Carregando</text></g>
+<g class="node primary">
+<rect x="236" y="62" width="128" height="40" rx="6"/>
+<text class="title" x="250" y="86">Preview</text></g>
+<g class="node">
+<rect x="444" y="62" width="128" height="40" rx="6"/>
+<text class="title" x="458" y="86">Source</text></g>
+<g class="node attention">
+<rect x="24" y="100" width="128" height="40" rx="6"/>
+<text class="title" x="38" y="124">Erro</text></g>
+</g>
+</svg>
+<figcaption>Estados mostrados ao lado do botão de download.</figcaption>
+</figure>
+
+<p>No erro, o Source do Jira continua visível e o motivo aparece ao lado do botão de download.</p><div class="accordion"><details><summary>Motivos de erro</summary><div class="body"><ul><li>file larger than 5 MB</li><li>issue not found</li><li>attachment not found</li><li><code>Jira returned &lt;status&gt;</code></li><li>could not load the file</li></ul></div></details></div></section>
+
+<section class="section"><h2>Contratos: manifesto, mensagens e dois GETs</h2>
+<div class="toolbar"><button class="btn" type="button" data-toggle-all="#contracts" data-label-open="Abrir tudo" data-label-close="Fechar tudo"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">Abrir tudo</span></button></div>
+<div class="contracts" id="contracts">
+<h3>Manifesto</h3><details class="contract cmd"><summary><span class="method cmd">CMD</span><code class="path">manifest.json · content_scripts</code><span class="sum">Dois scripts em <code>https://*.atlassian.net/*</code>.</span></summary><div class="body"><p>Superfície declarada no manifesto, versão 1.0.0, Manifest V3.</p><div class="table-wrap"><table><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody><tr><td><code>permissions</code></td><td><code>storage</code></td></tr><tr><td>Script isolado</td><td><code>content.js</code>, <code>document_idle</code></td></tr><tr><td>Script do page world</td><td><code>page.js</code>, <code>document_start</code>, <code>world: MAIN</code></td></tr><tr><td><code>background</code></td><td>service worker <code>background.js</code></td></tr><tr><td><code>sandbox.pages</code></td><td><code>preview.html</code></td></tr><tr><td><code>content_security_policy.sandbox</code></td><td><code>sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:</code></td></tr><tr><td><code>web_accessible_resources</code></td><td><code>preview.html</code>, <code>preview.js</code>, <code>preview.css</code> para <code>https://*.atlassian.net/*</code></td></tr></tbody></table></div></div></details>
+<h3>Mensagens internas</h3><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:editor-request</code><span class="sum">Content script pede o texto do editor ao page world.</span></summary><div class="body"><p>Enviada com <code>window.postMessage</code> para a origem da página. O page world ignora mensagens de outra janela.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-editor-req">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:editor-response</code><span class="sum">Page world devolve o texto do editor, ou <code>null</code>.</span></summary><div class="body"><p>Espera até 1500 ms o editor aparecer. O content script desiste após 2500 ms e usa o REST.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-editor-res">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:ready</code><span class="sum">preview.html avisa ao pai que pode renderizar.</span></summary><div class="body"><p>Enviada ao <code>window.parent</code> com destino <code>"*"</code>.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-ready">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:render</code><span class="sum">O pai envia o conteúdo a renderizar para preview.html.</span></summary><div class="body"><p>O iframe tem origem opaca: <code>"*"</code> é o único destino que o alcança. <code>framePreview</code>, em <code>src/preview-frame.ts</code>, monta o iframe e envia a mensagem. A página só aceita mensagem do próprio pai e com campos válidos.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-render">Ver JSON <span class="ct">mensagem</span></button></div></details><details class="contract evt"><summary><span class="method evt">EVT</span><code class="path">jira-attachment-preview:open-tab</code><span class="sum">Content script pede ao background que abra o preview em nova aba.</span></summary><div class="body"><p><code>chrome.runtime.sendMessage</code>. O background grava o snapshot em <code>chrome.storage.session</code> com um UUID e abre <code>tab.html?id=&lt;uuid&gt;</code>. Com o armazenamento cheio, descarta os snapshots mais antigos e as abas deles mostram a mensagem de expirado. A constante é <code>OPEN_TAB_TYPE</code>.</p><h4>Corpo da mensagem</h4><button class="body-link" type="button" data-detail="m-opentab">Ver JSON <span class="ct">mensagem</span></button></div></details>
+<h3>API REST do Jira</h3><details class="contract get"><summary><span class="method get">GET</span><code class="path">/rest/api/3/issue/{key}?fields=attachment</code><span class="sum">Lista os anexos do card para achar o arquivo do visualizador.</span></summary><div class="body"><p>Só roda no fallback. Escolhe o anexo de mesmo nome e tamanho compatível com o exibido; em empate, o mais recente.</p><h4>Autenticação</h4><p>Sessão do usuário no Jira (<code>credentials: include</code>, mesma origem).</p><h4>Parâmetros</h4><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Em</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>key</code> <span class="req">obrigatório</span></td><td>path</td><td>string</td><td>Chave do card, lida de <code>/browse/KEY</code> ou de <code>selectedIssue</code>.</td></tr><tr><td><code>fields</code></td><td>query</td><td>string</td><td>Fixo em <code>attachment</code>.</td></tr></tbody></table></div><h4>Respostas</h4><div class="resp"><span class="code c2">200</span><span>Usa <code>fields.attachment[]</code> com <code>id</code>, <code>filename</code>, <code>size</code>, <code>created</code>.</span></div><div class="resp"><span class="code c4">4xx</span><span>Qualquer status não OK vira o erro <code>Jira returned &lt;status&gt;</code>.</span></div></div></details><details class="contract get"><summary><span class="method get">GET</span><code class="path">/rest/api/3/attachment/content/{id}?redirect=false</code><span class="sum">Baixa o texto do anexo escolhido.</span></summary><div class="body"><p>Só roda depois do GET anterior. Recusa anexos acima de 5 MB antes de baixar.</p><h4>Autenticação</h4><p>Sessão do usuário no Jira (<code>credentials: include</code>).</p><h4>Parâmetros</h4><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Em</th><th>Tipo</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code> <span class="req">obrigatório</span></td><td>path</td><td>string</td><td>Id do anexo escolhido.</td></tr><tr><td><code>redirect</code></td><td>query</td><td>boolean</td><td>Fixo em <code>false</code>.</td></tr></tbody></table></div><h4>Respostas</h4><div class="resp"><span class="code c2">200</span><span>O corpo é lido como texto.</span></div><div class="resp"><span class="code c4">4xx</span><span>Vira o erro <code>Jira returned &lt;status&gt;</code>.</span></div></div></details>
+</div></section>
+
+<section class="section"><h2>Modelo de segurança</h2>
+<ul>
+<li>O preview roda num iframe <code>sandbox="allow-scripts"</code>, de origem opaca.</li>
+<li>Markdown passa por DOMPurify; só o renderizador executa scripts.</li>
+<li>Renderizador e Mermaid vão dentro da extensão. Nada sai do navegador.</li>
+<li>Única permissão: <code>storage</code>; scripts só em <code>*.atlassian.net</code>.</li>
+</ul>
+<div class="accordion"><details><summary>Ressalva da CSP do sandbox</summary><div class="body"><p>A CSP do sandbox permite scripts inline, <code>'unsafe-eval'</code> e scripts <code>https:</code> remotos. É uma exceção documentada à regra do repositório: os scripts são do anexo, que roda em origem opaca, sem acesso ao Jira nem à extensão. Protótipos com bibliotecas de CDN funcionam, e o leitor de CSV do Mermaid usa <code>new Function</code>. Formulários e popups ficam bloqueados.</p></div></details></div></section>
+
+<section class="section"><h2>Testes: 78 unitários e um e2e passaram</h2>
+<p>Vitest com jsdom. O e2e rodou no Chromium do Playwright contra um visualizador Jira falso.</p>
+<div class="accordion"><details><summary><code>editor-source.test.ts</code></summary><div class="body"><p>Leitura do editor (<code>cmView</code> e <code>rootView</code>), ponte por postMessage, ignora outras janelas, timeout.</p></div></details><details><summary><code>file-type.test.ts</code></summary><div class="body"><p>Extensões aceitas, leitura do tamanho exibido, vírgula decimal, limite de 5 MB.</p></div></details><details><summary><code>markdown.test.ts</code></summary><div class="body"><p>Tabelas e tarefas GFM, destaque de código, bloco desconhecido escapado, Mermaid com tema e com erro, remoção de script, handler e <code>javascript:</code>.</p></div></details><details><summary><code>messages.test.ts</code></summary><div class="body"><p>Validação da mensagem render e do tipo open-tab, iframe em sandbox, só aceita ready da própria janela.</p></div></details><details><summary><code>preview-controller.test.ts</code></summary><div class="body"><p>Preview por padrão, alternância, fallback REST (inclui editor com tamanho diferente do exibido), arquivo não suportado, limite de 5 MB, erro, troca de arquivo, fechamento, nova aba, controles removidos pelo Jira, tema.</p></div></details><details><summary><code>preview-render.test.ts</code></summary><div class="body"><p>HTML como documento inteiro, Markdown com tema, ready e render, mensagem malformada.</p></div></details><details><summary><code>rest-source.test.ts</code></summary><div class="body"><p>Chave do card, escolha do anexo, download sem redirect da CDN, sem chave, sem anexo, mais de 5 MB, erro HTTP.</p></div></details><details><summary><code>snapshot.test.ts</code></summary><div class="body"><p>Grava e abre a aba, descarta snapshots antigos com o armazenamento cheio, id ausente ou desconhecido, aba expirada.</p></div></details><details><summary><code>viewer.test.ts</code></summary><div class="body"><p>Leitura do arquivo e tamanho, observação de abrir/trocar/fechar, posição dos botões, estado de erro, limpeza.</p></div></details></div>
+<div class="accordion"><details><summary>Resultado do e2e</summary><div class="body"><ul><li>HTML renderizado com scripts e cookies bloqueados.</li><li>Alternância Preview / Source.</li><li>Nova aba aberta pelo background.</li><li>Markdown com tabela, código colorido e SVG do Mermaid.</li><li>Atributo <code>onerror</code> removido.</li></ul></div></details></div></section>
+
+<section class="section"><h2>Limitações</h2>
+<ul>
+<li>Só Jira Cloud (<code>*.atlassian.net</code>); não cobre Data Center, Server nem Confluence.</li>
+<li>URLs relativas dentro do arquivo não resolvem; as absolutas carregam.</li>
+<li>A leitura do editor depende de um interno do Jira (<code>cmView</code>). Se mudar, ou se o editor ainda tiver o arquivo anterior, o REST assume.</li>
+<li>O preview em nova aba é um snapshot e expira ao fechar o navegador ou quando o armazenamento da sessão enche.</li>
+</ul></section>
+
+<section class="section"><h2>Instalar e compartilhar</h2>
+<div class="accordion"><details><summary>Passos de instalação</summary><div class="body"><ol>
+<li>Rode <code>pnpm build</code> (ou <code>pnpm --filter jira-attachment-preview build</code>).</li>
+<li>Em <code>chrome://extensions</code>, use Load unpacked em <code>exts/jira-attachment-preview/dist</code>.</li>
+<li>Abra um card do Jira Cloud e clique num anexo suportado.</li>
+</ol></div></details></div>
+<p>Para compartilhar: <code>pnpm zip jira-attachment-preview</code> gera o zip com o <code>INSTALL.md</code> e a mensagem de chat.</p></section>
+<section class="section"><h2>Glossário, módulos e backlog</h2>
+<div class="accordion"><details><summary>Termo novo: Content source</summary><div class="body"><p>A origem do texto do anexo: o editor do visualizador primeiro, o REST como fallback.</p></div></details><details><summary>Onde cada tipo vive</summary><div class="body"><ul><li><code>Theme</code>: <code>src/messages.ts</code>.</li><li><code>framePreview</code>: <code>src/preview-frame.ts</code>.</li><li><code>PreviewError</code> e <code>TOO_LARGE_REASON</code>: <code>src/preview-error.ts</code>.</li><li>Campo do elemento do visualizador: <code>ViewerFile.viewer</code>. O testid do Jira <code>media-viewer-popup</code> continua.</li></ul></div></details><details><summary>Backlog: JAP-1</summary><div class="body"><p>Mostrar anexos <code>.excalidraw</code> como desenho, em vez do JSON. Status: aberto. Arquivo: <code>BACKLOG.md</code>.</p></div></details></div></section>
+<template id="d-m-editor-req" data-title="editor-request · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>window.postMessage</code>, content script para page world</dd><dt>Fonte</dt><dd><code>src/editor-source.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+  "type": "object",
+  "required": [
+    "type",
+    "requestId"
+  ],
+  "properties": {
+    "type": {
+      "const": "jira-attachment-preview:editor-request"
+    },
+    "requestId": {
+      "type": "string"
+    }
+  }
+}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:editor-request", "requestId": "&lt;uuid&gt;" }</code></pre></template><template id="d-m-editor-res" data-title="editor-response · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>window.postMessage</code>, page world para content script</dd><dt>Fonte</dt><dd><code>src/editor-source.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+  "type": "object",
+  "required": [
+    "type",
+    "requestId"
+  ],
+  "properties": {
+    "type": {
+      "const": "jira-attachment-preview:editor-response"
+    },
+    "requestId": {
+      "type": "string"
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:editor-response", "requestId": "&lt;uuid&gt;", "text": null }</code></pre></template><template id="d-m-ready" data-title="ready · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>postMessage</code>, preview.html para o pai</dd><dt>Fonte</dt><dd><code>src/messages.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+  "type": "object",
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "type": {
+      "const": "jira-attachment-preview:ready"
+    }
+  }
+}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:ready" }</code></pre></template><template id="d-m-render" data-title="render · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>postMessage</code>, pai para preview.html</dd><dt>Fonte</dt><dd><code>src/messages.ts</code></dd></dl><h4>Schema</h4><pre class="json"><code>{
+  "type": "object",
+  "required": [
+    "type",
+    "fileName",
+    "kind",
+    "content",
+    "theme"
+  ],
+  "properties": {
+    "type": {
+      "const": "jira-attachment-preview:render"
+    },
+    "fileName": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "html",
+        "markdown"
+      ]
+    },
+    "content": {
+      "type": "string"
+    },
+    "theme": {
+      "enum": [
+        "light",
+        "dark"
+      ]
+    }
+  }
+}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:render", "fileName": "a.md", "kind": "markdown", "content": "# Título", "theme": "light" }</code></pre></template><template id="d-m-opentab" data-title="open-tab · mensagem" data-wide><dl class="kv"><dt>Canal</dt><dd><code>chrome.runtime.sendMessage</code>, content script para background</dd><dt>Fonte</dt><dd><code>src/messages.ts</code> (<code>OPEN_TAB_TYPE</code>)</dd></dl><h4>Schema</h4><pre class="json"><code>{
+  "type": "object",
+  "required": [
+    "type",
+    "snapshot"
+  ],
+  "properties": {
+    "type": {
+      "const": "jira-attachment-preview:open-tab"
+    },
+    "snapshot": {
+      "type": "object",
+      "required": [
+        "fileName",
+        "kind",
+        "content",
+        "theme"
+      ],
+      "properties": {
+        "fileName": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "html",
+            "markdown"
+          ]
+        },
+        "content": {
+          "type": "string"
+        },
+        "theme": {
+          "enum": [
+            "light",
+            "dark"
+          ]
+        }
+      }
+    }
+  }
+}</code></pre><h4>Exemplo</h4><pre class="json"><code>{ "type": "jira-attachment-preview:open-tab", "snapshot": { "fileName": "a.md", "kind": "markdown", "content": "# Título", "theme": "light" } }</code></pre></template>
+<template id="d-content" data-title="Content script"><p>Observa o visualizador, decide pelo nome do arquivo, carrega o conteúdo, monta o iframe e o botão de alternância.</p><dl><dt>Arquivos</dt><dd><code>content.ts</code>, <code>preview-controller.ts</code>, <code>preview-frame.ts</code>, <code>preview-error.ts</code>, <code>viewer.ts</code></dd></dl></template>
+<template id="d-editor" data-title="Leitor do editor"><p>Script no page world. Lê o texto completo do editor CodeMirror do Jira e o devolve por <code>postMessage</code>.</p><dl><dt>Arquivos</dt><dd><code>page.ts</code>, <code>editor-source.ts</code></dd></dl></template>
+<template id="d-rest" data-title="REST Jira"><p>Usado quando o visualizador não mostra editor ou o texto do editor tem tamanho diferente do exibido (editor ainda com o arquivo anterior). Dois GETs com a sessão do usuário.</p><dl><dt>Arquivo</dt><dd><code>rest-source.ts</code></dd></dl></template>
+<template id="d-preview" data-title="preview.html"><p>Página em sandbox. HTML substitui o documento; Markdown vira HTML sanitizado com código colorido e Mermaid.</p><dl><dt>Arquivos</dt><dd><code>preview.ts</code>, <code>preview-render.ts</code>, <code>markdown.ts</code></dd></dl></template>
+<template id="d-bg" data-title="Background"><p>Recebe <code>jira-attachment-preview:open-tab</code>, grava o snapshot em <code>chrome.storage.session</code> e abre a aba. Se o armazenamento estiver cheio, apaga os snapshots mais antigos.</p><dl><dt>Arquivos</dt><dd><code>background.ts</code>, <code>snapshot.ts</code></dd></dl></template>
+<template id="d-tab" data-title="Nova aba"><p>Lê o snapshot pelo id e o mostra no mesmo <code>preview.html</code>. Sem snapshot, mostra "Preview expired — open it again from Jira".</p><dl><dt>Arquivos</dt><dd><code>tab.ts</code>, <code>tab-page.ts</code>, <code>preview-frame.ts</code></dd></dl></template>
+
+
+<!-- /report-html:content -->
+</article></main>
+<dialog id="detail" aria-labelledby="dlg-title"><div class="dlg-head"><h3 class="dlg-title" id="dlg-title"></h3><button class="btn ghost dlg-close" type="button" aria-label="Fechar"><i class="ic ic-x" aria-hidden="true"></i>Fechar</button></div><div class="dlg-body"></div></dialog>
+<script>
+/* report-html common behavior: detail dialog (click on text links and SVG nodes), accordion controls and the infinite canvas of every diagram. */
+(function () {
+  "use strict";
+  function externalLinks(root) {
+    root.querySelectorAll('a[href^="http"]').forEach(function (a) {
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener noreferrer");
+    });
+  }
+  externalLinks(document);
+  // Width toggle (reports only): 50% of the screen (default) or fixed at 880px. The choice is remembered when storage allows.
+  var wbtn = document.querySelector(".width-toggle"), col = document.querySelector(".reading");
+  if (wbtn && col) {
+    var KEY = "report-html:width";
+    var apply = function (fixed) {
+      col.classList.toggle("fixed", fixed);
+      wbtn.setAttribute("aria-pressed", fixed ? "true" : "false");
+      wbtn.querySelector(".label").textContent = wbtn.getAttribute(fixed ? "data-fixed" : "data-fluid");
+    };
+    try { apply(localStorage.getItem(KEY) === "fixed"); } catch (e) { apply(false); }
+    wbtn.addEventListener("click", function () {
+      var fixed = !col.classList.contains("fixed");
+      apply(fixed);
+      try { localStorage.setItem(KEY, fixed ? "fixed" : "fluid"); } catch (e) {}
+    });
+  }
+
+  var dlg = document.getElementById("detail");
+  if (!dlg) return;
+  var titleEl = dlg.querySelector(".dlg-title");
+  var bodyEl = dlg.querySelector(".dlg-body");
+
+  var JSON_TOKEN = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
+  function span(cls, text) { var e = document.createElement("span"); e.className = cls; e.textContent = text; return e; }
+  function decorate(root) {
+    root.querySelectorAll("pre.json").forEach(function (pre) {
+      var code = pre.querySelector("code") || pre;
+      var text = code.textContent;
+      code.textContent = "";
+      var last = 0, m;
+      JSON_TOKEN.lastIndex = 0;
+      while ((m = JSON_TOKEN.exec(text))) {
+        if (m.index > last) code.appendChild(document.createTextNode(text.slice(last, m.index)));
+        if (m[1] && m[2]) { code.appendChild(span("k", m[1])); code.appendChild(document.createTextNode(m[2])); }
+        else if (m[1]) code.appendChild(span("s", m[1]));
+        else if (m[3]) code.appendChild(span("b", m[0]));
+        else if (m[0] === "null") code.appendChild(span("z", m[0]));
+        else code.appendChild(span("n", m[0]));
+        last = JSON_TOKEN.lastIndex;
+      }
+      if (last < text.length) code.appendChild(document.createTextNode(text.slice(last)));
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = "copy"; btn.textContent = document.documentElement.lang === "en" ? "Copy" : "Copiar";
+      btn.addEventListener("click", function () {
+        var done = function () { btn.textContent = document.documentElement.lang === "en" ? "Copied" : "Copiado"; setTimeout(function () { btn.textContent = document.documentElement.lang === "en" ? "Copy" : "Copiar"; }, 1500); };
+        if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+      });
+      pre.appendChild(btn);
+    });
+  }
+
+  function openDetail(id) {
+    var tpl = document.getElementById("d-" + id);
+    if (!tpl) { console.warn("report-html: no <template id=\"d-" + id + "\">"); return; }
+    titleEl.textContent = tpl.getAttribute("data-title") || "";
+    dlg.classList.toggle("wide", tpl.hasAttribute("data-wide"));
+    bodyEl.innerHTML = "";
+    bodyEl.appendChild(tpl.content.cloneNode(true));
+    externalLinks(bodyEl);
+    decorate(bodyEl);
+    dlg.showModal();
+    bodyEl.scrollTop = 0;
+  }
+
+  // Any element with data-detail opens the dialog. SVG nodes become keyboard buttons.
+  document.querySelectorAll("[data-detail]").forEach(function (el) {
+    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+    if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+    el.addEventListener("click", function (e) { e.preventDefault(); openDetail(el.getAttribute("data-detail")); });
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(el.getAttribute("data-detail")); }
+    });
+  });
+
+  dlg.querySelector(".dlg-close").addEventListener("click", function () { dlg.close(); });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); }); // backdrop
+
+  // "Expand all / Collapse all" for accordions.
+  document.querySelectorAll("[data-toggle-all]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var scope = document.querySelector(btn.getAttribute("data-toggle-all")) || document;
+      var items = scope.querySelectorAll("details");
+      var anyClosed = Array.prototype.some.call(items, function (d) { return !d.open; });
+      items.forEach(function (d) { d.open = anyClosed; });
+      btn.querySelector(".label").textContent = anyClosed ? btn.getAttribute("data-label-close") : btn.getAttribute("data-label-open");
+    });
+  });
+
+  // report-html:infinite-canvas
+  // Every figure.diagram is an infinite canvas. In a report the diagram itself pans and zooms in place
+  // (drag to pan, Ctrl/Cmd + wheel or pinch to zoom around the pointer, double-click or 0 to fit, +/- keys),
+  // so a plain wheel still scrolls the page. Every figure also gets an "Ampliar" button that opens the
+  // same canvas full screen, where the plain wheel zooms. In slides only the button is added, so the
+  // deck keeps its own keyboard and gestures. data-zoom="Title" only overrides the full-screen title.
+  // Nodes with data-detail stay clickable; a drag never counts as a click.
+  var en = document.documentElement.lang === "en";
+  var T = en
+    ? { out: "Zoom out", inn: "Zoom in", fit: "Fit", expand: "Expand", close: "Close",
+        hint: "Drag to move · wheel to zoom · double-click to fit", wheel: "Use Ctrl or ⌘ + wheel to zoom" }
+    : { out: "Diminuir", inn: "Aumentar", fit: "Ajustar", expand: "Ampliar", close: "Fechar",
+        hint: "Arraste para mover · role para ampliar · clique duplo para ajustar", wheel: "Use Ctrl ou ⌘ + roda para ampliar" };
+
+  function viewBoxOf(svg) {
+    var vb = (svg.getAttribute("viewBox") || "").split(/[\s,]+/).map(Number);
+    if (vb.length !== 4 || vb.some(isNaN)) { var bb = svg.getBBox(); vb = [bb.x, bb.y, bb.width, bb.height]; }
+    return { x: vb[0], y: vb[1], w: vb[2], h: vb[3] };
+  }
+
+  // Pan and zoom one <svg> inside one element by rewriting its viewBox.
+  // opts.modifierZoom: the wheel zooms only with Ctrl/Cmd (pinch sends Ctrl); otherwise it scrolls the page.
+  // opts.pad: margin around the diagram when fitted. opts.onLevel(text): zoom level display.
+  function makeCanvas(el, opts) {
+    var c = { svg: null, base: null, view: null, touched: false };
+    var drag = null, moved = false, hintTimer = null;
+    c.setView = function (v) {
+      c.view = v;
+      c.svg.setAttribute("viewBox", v.x + " " + v.y + " " + v.w + " " + v.h);
+      if (opts.onLevel) opts.onLevel(Math.round((c.base.fitW / v.w) * 100) + "%");
+    };
+    c.fit = function () {
+      var r = el.getBoundingClientRect();
+      if (!c.svg || r.width < 1 || r.height < 1) return;
+      var aspect = r.width / r.height, b = c.base;
+      var w = b.w * (1 + opts.pad * 2), h = b.h * (1 + opts.pad * 2);
+      if (w / h < aspect) w = h * aspect; else h = w / aspect;
+      b.fitW = w; c.touched = false;
+      c.setView({ x: b.x + b.w / 2 - w / 2, y: b.y + b.h / 2 - h / 2, w: w, h: h });
+    };
+    // Keep the scale and the center when the element changes size, once the reader has moved the view.
+    c.resize = function () {
+      var r = el.getBoundingClientRect();
+      if (!c.view || !c.touched) return c.fit();
+      if (r.width < 1 || r.height < 1) return;
+      var h = c.view.w * (r.height / r.width);
+      c.setView({ x: c.view.x, y: c.view.y + (c.view.h - h) / 2, w: c.view.w, h: h });
+    };
+    c.zoomAt = function (factor, cx, cy) {
+      if (!c.view) return;
+      var r = el.getBoundingClientRect();
+      var px = cx === undefined ? 0.5 : (cx - r.left) / r.width, py = cy === undefined ? 0.5 : (cy - r.top) / r.height;
+      var w = Math.min(Math.max(c.view.w / factor, c.base.fitW / 40), c.base.fitW * 40), h = w * (c.view.h / c.view.w);
+      c.touched = true;
+      c.setView({ x: c.view.x + (c.view.w - w) * px, y: c.view.y + (c.view.h - h) * py, w: w, h: h });
+    };
+    c.attach = function (svg) {
+      c.svg = svg;
+      c.base = viewBoxOf(svg);
+      svg.removeAttribute("width"); svg.removeAttribute("height");
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+      c.view = null;
+    };
+    el.addEventListener("wheel", function (e) {
+      if (opts.modifierZoom && !e.ctrlKey && !e.metaKey) {
+        if (opts.onWheelHint) { opts.onWheelHint(true); clearTimeout(hintTimer); hintTimer = setTimeout(function () { opts.onWheelHint(false); }, 1200); }
+        return; // the page scrolls
+      }
+      e.preventDefault();
+      c.zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), e.clientX, e.clientY);
+    }, { passive: false });
+    el.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0 || !c.view) return;
+      drag = { x: e.clientX, y: e.clientY, vx: c.view.x, vy: c.view.y }; moved = false;
+    });
+    el.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+      if (!moved) { moved = true; el.classList.add("dragging"); el.setPointerCapture(e.pointerId); }
+      var r = el.getBoundingClientRect(), k = c.view.w / r.width;
+      c.touched = true;
+      c.setView({ x: drag.vx - dx * k, y: drag.vy - dy * k, w: c.view.w, h: c.view.h });
+    });
+    var endDrag = function () { drag = null; el.classList.remove("dragging"); setTimeout(function () { moved = false; }, 0); };
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+    // A drag that ends over a node must not open its detail: stop the click before it reaches the node.
+    el.addEventListener("click", function (e) { if (moved) { e.stopPropagation(); e.preventDefault(); } }, true);
+    el.addEventListener("dblclick", function (e) { if (!e.target.closest("[data-detail]")) c.fit(); });
+    el.addEventListener("keydown", function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "+" || e.key === "=") { e.preventDefault(); c.zoomAt(1.25); }
+      else if (e.key === "-") { e.preventDefault(); c.zoomAt(0.8); }
+      else if (e.key === "0") { e.preventDefault(); c.fit(); }
+    });
+    return c;
+  }
+
+  function figureTitle(fig) {
+    var z = fig.getAttribute("data-zoom"), heading = fig.previousElementSibling, svg = fig.querySelector("svg");
+    if (z) return z;
+    if (heading && /^H[1-6]$/.test(heading.tagName)) return heading.textContent;
+    return (svg && svg.getAttribute("aria-label")) || "";
+  }
+  function controls(withZoom) {
+    var bar = document.createElement("div");
+    bar.className = "canvas-tools";
+    bar.innerHTML = (withZoom ?
+      '<button class="btn ghost" type="button" data-z="out" aria-label="' + T.out + '"><i class="ic ic-minus" aria-hidden="true"></i></button>' +
+      '<span class="zoom-level tnum">100%</span>' +
+      '<button class="btn ghost" type="button" data-z="in" aria-label="' + T.inn + '"><i class="ic ic-plus" aria-hidden="true"></i></button>' +
+      '<button class="btn ghost" type="button" data-z="fit">' + T.fit + '</button>' : "") +
+      '<button class="btn ghost zoom-open" type="button" data-z="expand"><i class="ic ic-expand" aria-hidden="true"></i><span class="label">' + T.expand + "</span></button>";
+    return bar;
+  }
+
+  var figures = Array.prototype.filter.call(document.querySelectorAll("figure.diagram"), function (f) {
+    return f.querySelector("svg") && !f.closest("template");
+  });
+  if (figures.length) {
+    // Full-screen canvas, shared by every figure.
+    var zdlg = document.createElement("dialog");
+    zdlg.className = "zoom";
+    zdlg.setAttribute("aria-labelledby", "zoom-title");
+    zdlg.innerHTML = '<div class="zoom-head"><h3 id="zoom-title"></h3>' +
+      '<span class="zoom-hint">' + T.hint + '</span>' +
+      '<button class="btn ghost" type="button" data-z="out" aria-label="' + T.out + '"><i class="ic ic-minus" aria-hidden="true"></i></button>' +
+      '<span class="zoom-level tnum">100%</span>' +
+      '<button class="btn ghost" type="button" data-z="in" aria-label="' + T.inn + '"><i class="ic ic-plus" aria-hidden="true"></i></button>' +
+      '<button class="btn ghost" type="button" data-z="fit">' + T.fit + '</button>' +
+      '<button class="btn ghost" type="button" data-z="close"><i class="ic ic-x" aria-hidden="true"></i>' + T.close + '</button></div>' +
+      '<div class="zoom-canvas" tabindex="0"></div>';
+    document.body.appendChild(zdlg);
+    var zel = zdlg.querySelector(".zoom-canvas"), zlevel = zdlg.querySelector(".zoom-level");
+    var full = makeCanvas(zel, { pad: 0.05, modifierZoom: false, onLevel: function (t) { zlevel.textContent = t; } });
+    var openZoom = function (fig) {
+      zdlg.querySelector("#zoom-title").textContent = figureTitle(fig);
+      zel.innerHTML = "";
+      var src = fig.querySelector("svg"), svg = src.cloneNode(true);
+      svg.setAttribute("viewBox", src.getAttribute("data-viewbox") || src.getAttribute("viewBox"));
+      zel.appendChild(svg);
+      full.attach(svg);
+      svg.querySelectorAll("[data-detail]").forEach(function (el) {
+        el.addEventListener("click", function (e) { e.preventDefault(); openDetail(el.getAttribute("data-detail")); });
+        el.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(el.getAttribute("data-detail")); }
+        });
+      });
+      zdlg.showModal();
+      full.fit();
+      zel.focus();
+    };
+    zdlg.addEventListener("keydown", function (e) {
+      if (dlg.open || e.target === zel) return; // the canvas handles its own keys
+      if (e.key === "+" || e.key === "=") full.zoomAt(1.25);
+      else if (e.key === "-") full.zoomAt(0.8);
+      else if (e.key === "0") full.fit();
+    });
+    zdlg.querySelector(".zoom-head").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-z]"); if (!b) return;
+      var z = b.getAttribute("data-z");
+      if (z === "in") full.zoomAt(1.25); else if (z === "out") full.zoomAt(0.8); else if (z === "fit") full.fit(); else zdlg.close();
+    });
+    window.addEventListener("resize", function () { if (zdlg.open) full.resize(); });
+
+    figures.forEach(function (fig) {
+      var svg = fig.querySelector("svg");
+      if (fig.closest(".slide")) { // slides: only the full-screen button
+        var sbar = controls(false);
+        sbar.classList.add("float");
+        sbar.addEventListener("click", function () { openZoom(fig); });
+        fig.insertBefore(sbar, fig.firstChild);
+        return;
+      }
+      // Reports: the diagram itself becomes the canvas.
+      var base = viewBoxOf(svg);
+      svg.setAttribute("data-viewbox", base.x + " " + base.y + " " + base.w + " " + base.h);
+      var el = document.createElement("div");
+      el.className = "canvas";
+      el.tabIndex = 0;
+      el.setAttribute("aria-label", (en ? "Diagram canvas: " : "Canvas do diagrama: ") + (svg.getAttribute("aria-label") || ""));
+      var hint = document.createElement("span");
+      hint.className = "canvas-hint"; hint.textContent = T.wheel;
+      svg.parentNode.insertBefore(el, svg);
+      el.appendChild(svg);
+      el.appendChild(hint);
+      var bar = controls(true), level = bar.querySelector(".zoom-level");
+      fig.insertBefore(bar, fig.firstChild);
+      var cv = makeCanvas(el, {
+        pad: 0.02, modifierZoom: true,
+        onLevel: function (t) { level.textContent = t; },
+        onWheelHint: function (on) { el.classList.toggle("hinting", on); }
+      });
+      cv.attach(svg);
+      bar.addEventListener("click", function (e) {
+        var b = e.target.closest("[data-z]"); if (!b) return;
+        var z = b.getAttribute("data-z");
+        if (z === "in") cv.zoomAt(1.25); else if (z === "out") cv.zoomAt(0.8); else if (z === "fit") cv.fit(); else openZoom(fig);
+      });
+      // Height: the diagram's natural height at the column width, capped at 70% of the viewport.
+      var lastW = -1;
+      var size = function () {
+        var w = el.clientWidth;
+        if (w < 1) return; // inside a closed accordion: sized when it opens
+        var h = Math.round(Math.min(w * base.h / base.w, window.innerHeight * 0.7));
+        if (w !== lastW || el.style.height !== h + "px") { lastW = w; el.style.height = Math.max(h, 120) + "px"; }
+        cv.resize();
+      };
+      if (window.ResizeObserver) new ResizeObserver(size).observe(el);
+      window.addEventListener("resize", size);
+      size();
+    });
+  }
+
+  window.reportHtml = { openDetail: openDetail };
+})();
+
+</script>
+</body>
+</html>

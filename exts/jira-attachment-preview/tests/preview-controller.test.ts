@@ -74,6 +74,46 @@ describe("PreviewController", () => {
     expect(d.fetchAttachmentText).toHaveBeenCalled();
   });
 
+  it("waits out an editor that still holds the previous file, then uses its new text", async () => {
+    vi.useFakeTimers();
+    openViewer("a.html", "html · 14 KB");
+    const second = `<p>second file</p>${" ".repeat(14 * 1024 - 18)}`;
+    const requestEditorText = vi
+      .fn()
+      .mockResolvedValueOnce(EDITOR_TEXT)
+      .mockResolvedValueOnce(EDITOR_TEXT)
+      .mockResolvedValue(second);
+    const d = deps({ requestEditorText });
+    const controller = new PreviewController(d);
+    await controller.show(current());
+    switchFile("b.html", "html · 14 KB");
+    const showing = controller.show(current());
+    await vi.runAllTimersAsync();
+    await showing;
+    vi.useRealTimers();
+    click("Open in new tab");
+    expect(d.sendMessage).toHaveBeenLastCalledWith(
+      expect.objectContaining({ snapshot: expect.objectContaining({ content: second }) }),
+    );
+    expect(d.fetchAttachmentText).not.toHaveBeenCalled();
+  });
+
+  it("uses Jira REST when the editor keeps the previous file", async () => {
+    vi.useFakeTimers();
+    openViewer("a.html", "html · 14 KB");
+    const d = deps();
+    const controller = new PreviewController(d);
+    await controller.show(current());
+    switchFile("b.html", "html · 14 KB");
+    const showing = controller.show(current());
+    await vi.runAllTimersAsync();
+    await showing;
+    vi.useRealTimers();
+    expect(d.fetchAttachmentText).toHaveBeenCalledWith(
+      expect.objectContaining({ fileName: "b.html" }),
+    );
+  });
+
   it("adds nothing for an unsupported file", async () => {
     openViewer("notes.txt", "txt · 1 KB");
     await new PreviewController(deps()).show(current());

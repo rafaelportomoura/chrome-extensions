@@ -2,8 +2,11 @@
 // and Preview to it. Every added element carries ADDED_ATTRIBUTE so it can be removed as a set.
 
 export const ADDED_ATTRIBUTE = "data-jira-attachment-preview";
+/** Marks a viewer the extension made a positioned element, so cleanup can undo it. */
+export const POSITIONED_ATTRIBUTE = "data-jira-attachment-preview-positioned";
 
-const VIEWER = '[data-testid="media-viewer-popup"]';
+/** The attachment viewer's root element. */
+export const VIEWER_SELECTOR = '[data-testid="media-viewer-popup"]';
 const FILE_NAME = '[data-testid="media-viewer-file-name"]';
 const FILE_METADATA = '[data-testid="media-viewer-file-metadata-text"]';
 const DOWNLOAD_BUTTON = '[data-testid="media-viewer-download-button"]';
@@ -18,7 +21,7 @@ export interface ViewerFile {
 
 /** The file the open attachment viewer shows, or null when no viewer is open. */
 export function readViewer(doc: Document): ViewerFile | null {
-  const viewer = doc.querySelector<HTMLElement>(VIEWER);
+  const viewer = doc.querySelector<HTMLElement>(VIEWER_SELECTOR);
   const name = viewer?.querySelector(FILE_NAME)?.textContent?.trim();
   if (!viewer || !name) return null;
   const sizeText = viewer.querySelector(FILE_METADATA)?.textContent?.trim() ?? "";
@@ -52,9 +55,13 @@ export function watchViewer(
   return () => observer.disconnect();
 }
 
-/** Removes everything the extension added to the page. */
+/** Removes everything the extension added to the page and undoes its style change. */
 export function removeAdded(doc: Document): void {
   for (const element of doc.querySelectorAll(`[${ADDED_ATTRIBUTE}]`)) element.remove();
+  for (const element of doc.querySelectorAll<HTMLElement>(`[${POSITIONED_ATTRIBUTE}]`)) {
+    element.style.position = "";
+    element.removeAttribute(POSITIONED_ATTRIBUTE);
+  }
 }
 
 export type ControlsState = "loading" | "preview" | "source" | "error";
@@ -155,6 +162,7 @@ export function mountPreviewHost(file: ViewerFile): HTMLElement {
   // The host is positioned against the viewer, so the viewer must be a positioned element.
   if (doc.defaultView?.getComputedStyle(file.viewer).position === "static") {
     file.viewer.style.position = "relative";
+    file.viewer.setAttribute(POSITIONED_ATTRIBUTE, "");
   }
   const host = doc.createElement("div");
   host.setAttribute(ADDED_ATTRIBUTE, "preview");

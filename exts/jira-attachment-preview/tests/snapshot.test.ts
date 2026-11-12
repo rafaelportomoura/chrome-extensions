@@ -22,6 +22,16 @@ describe("openSnapshotTab", () => {
 });
 
 describe("openSnapshotTab when session storage is full", () => {
+  it("keeps snapshots when storing fails for another reason", async () => {
+    await chrome.storage.session.set({ "snapshot:old": snapshot });
+    const set = chrome.storage.session.set as unknown as ReturnType<typeof vi.fn>;
+    set.mockImplementationOnce(async () => {
+      throw new Error("Invalid value");
+    });
+    await expect(openSnapshotTab(snapshot)).rejects.toThrow("Invalid value");
+    await expect(loadSnapshot("old")).resolves.toEqual(snapshot);
+  });
+
   it("drops older snapshots to make room", async () => {
     await chrome.storage.session.set({ "snapshot:old": snapshot, other: 1 });
     const set = chrome.storage.session.set as unknown as ReturnType<typeof vi.fn>;
