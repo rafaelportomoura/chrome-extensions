@@ -19,6 +19,7 @@ Built with `pnpm --filter jira-attachment-preview build`; load
 | `src/selectors.ts`                                               | Jira attachment viewer selectors shared by both worlds.                           |
 | `src/preview.ts`, `src/preview-render.ts`, `static/preview.html` | Sandbox page that renders one Preview.                                            |
 | `src/markdown.ts`, `static/preview.css`                          | Markdown to sanitised HTML, code highlighting, Mermaid diagrams, light/dark.      |
+| `src/front-matter.ts`                                            | Splits YAML front matter off a Markdown file.                                     |
 | `src/messages.ts`                                                | Messages between the scripts and pages; frames the preview page.                  |
 | `src/background.ts`, `src/snapshot.ts`                           | Background worker: stores a snapshot and opens the new-tab page.                  |
 | `src/tab.ts`, `src/tab-page.ts`, `static/tab.html`               | New-tab page: shows a snapshot, or says it expired.                               |
@@ -39,7 +40,8 @@ Built with `pnpm --filter jira-attachment-preview build`; load
    - HTML replaces the page and runs with its scripts, in an opaque origin with no access to the
      Jira page, its cookies or the session;
    - Markdown is rendered as GitHub-flavoured Markdown with highlighted code blocks and Mermaid
-     diagrams, all bundled in the extension. Embedded HTML is sanitised with DOMPurify, so only
+     diagrams. A YAML front matter block (`---` at the top) shows as a key/value table, or as
+     highlighted YAML when it is nested, all bundled in the extension. Embedded HTML is sanitised with DOMPurify, so only
      the renderer runs scripts. It follows Jira's light or dark theme.
 4. "Source" hides the Preview and shows Jira's view unchanged. "Open in new tab" stores a
    snapshot in `chrome.storage.session` and opens it in an extension page.

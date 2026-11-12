@@ -1,8 +1,10 @@
-// Turns Markdown into the sanitised HTML of a Markdown Preview: GitHub-flavoured Markdown,
-// highlighted code blocks and Mermaid diagrams. Runs inside the sandboxed preview page.
+// Turns Markdown into the sanitised HTML of a Markdown Preview: YAML front matter as a table,
+// GitHub-flavoured Markdown, highlighted code blocks and Mermaid diagrams. Runs inside the
+// sandboxed preview page.
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import { Marked, type Tokens } from "marked";
+import { type FrontMatter, splitFrontMatter } from "./front-matter";
 import type { Theme } from "./messages";
 
 function escapeHtml(text: string): string {
@@ -25,9 +27,22 @@ function renderCode({ text, lang }: Tokens.Code): string {
 
 const marked = new Marked({ gfm: true, async: false, renderer: { code: renderCode } });
 
+/** Front matter as a two-column table, or as highlighted YAML when it is not flat. */
+function renderFrontMatter({ yaml, fields }: FrontMatter): string {
+  if (fields === null) {
+    return `<div class="front-matter">${renderCode({ type: "code", raw: yaml, text: yaml, lang: "yaml" })}</div>\n`;
+  }
+  const rows = fields
+    .map(([key, value]) => `<tr><th>${escapeHtml(key)}</th><td>${escapeHtml(value)}</td></tr>`)
+    .join("");
+  return `<table class="front-matter"><tbody>${rows}</tbody></table>\n`;
+}
+
 /** Markdown to HTML with scripts, event handlers and `javascript:` URLs removed. */
 export function markdownToSafeHtml(markdown: string): string {
-  const html = marked.parse(markdown) as string;
+  const { frontMatter, body } = splitFrontMatter(markdown);
+  const header = frontMatter ? renderFrontMatter(frontMatter) : "";
+  const html = header + (marked.parse(body) as string);
   return DOMPurify.sanitize(html);
 }
 

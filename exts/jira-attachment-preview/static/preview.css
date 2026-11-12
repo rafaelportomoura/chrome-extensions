@@ -144,6 +144,25 @@ body {
   border: 0;
 }
 
+.markdown-body .front-matter {
+  display: table;
+  width: 100%;
+  font-size: 14px;
+}
+
+.markdown-body table.front-matter th {
+  width: 1%;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.markdown-body table.front-matter td {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
 .mermaid-diagram {
   margin: 0 0 16px;
   text-align: center;
