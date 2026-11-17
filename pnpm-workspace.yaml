@@ -3,3 +3,12 @@ packages:
   - scripts
 allowBuilds:
   esbuild: true
+# Ignored on 2026-11-17: picomatch <= 4.0.7 has a ReDoS in single-branch repeated extglobs, and no
+# patched version exists on npm (4.0.7 is the latest). It only enters through the dev-only chain
+# vitest > vite > tinyglobby, so it never reaches a built extension.
+# Expected fix: picomatch merges PR #194 (micromatch/picomatch) and publishes a release above 4.0.7.
+# Retry by 2026-11-24: if a patched version exists, upgrade (or override to it) and delete this
+# entry; otherwise re-check and move the date a week forward.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-fc5q-39xc-vjpf
