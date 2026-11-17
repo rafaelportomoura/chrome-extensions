@@ -21,6 +21,7 @@ import {
   mountControls,
   mountPreviewHost,
   removeAdded,
+  showLoading,
   type ViewerFile,
 } from "./viewer";
 
@@ -76,6 +77,9 @@ export class PreviewController {
     });
     this.controls = controls;
     controls.setState("loading");
+    const host = mountPreviewHost(file);
+    this.host = host;
+    const hideLoading = showLoading(host);
 
     try {
       const content = await this.loadContent(file, generation);
@@ -85,13 +89,13 @@ export class PreviewController {
       }
       const payload = this.payload(file, kind, content);
       this.lastPayload = payload;
-      const host = mountPreviewHost(file);
-      this.host = host;
-      framePreview(host, payload, this.deps.previewUrl(kind));
+      framePreview(host, payload, this.deps.previewUrl(kind), hideLoading);
       controls.setState("preview");
       log("preview shown", file.name);
     } catch (error) {
       if (generation !== this.generation) return;
+      host.remove();
+      this.host = null;
       const reason = error instanceof PreviewError ? error.message : "could not load the file";
       if (!(error instanceof PreviewError)) logError("preview failed", file.name, error);
       else log("no preview", file.name, reason);

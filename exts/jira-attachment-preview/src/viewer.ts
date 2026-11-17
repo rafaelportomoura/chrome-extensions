@@ -170,3 +170,26 @@ export function mountPreviewHost(file: ViewerFile): HTMLElement {
   file.viewer.append(host);
   return host;
 }
+
+export const LOADING_TEXT = "Loading preview…";
+
+/** Fills the Preview host with a spinner and a message; returns a function that removes them. */
+export function showLoading(host: HTMLElement): () => void {
+  const doc = host.ownerDocument;
+  const overlay = doc.createElement("div");
+  overlay.setAttribute("role", "status");
+  overlay.style.cssText =
+    "position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;" +
+    "justify-content:center;gap:12px;color:#44546f;font:500 14px/20px system-ui,sans-serif;";
+  overlay.innerHTML =
+    '<svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">' +
+    '<circle cx="16" cy="16" r="12" fill="none" stroke="#dfe1e6" stroke-width="4"/>' +
+    '<path d="M16 4a12 12 0 0 1 12 12" fill="none" stroke="#0c66e4" stroke-width="4" stroke-linecap="round">' +
+    '<animateTransform attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="0.9s" repeatCount="indefinite"/>' +
+    "</path></svg>";
+  const text = doc.createElement("span");
+  text.textContent = LOADING_TEXT;
+  overlay.append(text);
+  host.append(overlay);
+  return () => overlay.remove();
+}

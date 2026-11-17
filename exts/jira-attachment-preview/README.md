@@ -32,7 +32,8 @@ Built with `pnpm --filter jira-attachment-preview build`; load
 1. The content script watches Jira pages on `*.atlassian.net` for the attachment viewer. When it
    shows a file whose name ends in `.html`, `.htm`, `.md`, `.markdown`, `.excalidraw` or
    `.excalidraw.json` (any case), it adds the
-   controls and starts loading from a content source. Other files are left alone; SVG is
+   controls and starts loading from a content source, showing a spinner and a "Loading preview…"
+   message over the preview area until the Preview is ready. Other files are left alone; SVG is
    already rendered by Jira.
 2. The content comes from the viewer's own code editor: Jira keeps the whole file in memory but
    draws only the visible lines, so a page-world script reads it and posts it back. When the

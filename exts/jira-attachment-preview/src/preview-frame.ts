@@ -1,11 +1,12 @@
 // Frames the sandboxed preview page and hands it the Preview to show.
 import { isReadyMessage, type PreviewPayload, RENDER_TYPE, type RenderMessage } from "./messages";
 
-/** Frames preview.html in `container` and renders `payload` once the frame is ready. */
+/** Frames preview.html in `container` and renders `payload` once the frame is ready, then calls `onReady`. */
 export function framePreview(
   container: HTMLElement,
   payload: PreviewPayload,
   previewUrl: string,
+  onReady?: () => void,
 ): HTMLIFrameElement {
   const doc = container.ownerDocument;
   const frame = doc.createElement("iframe");
@@ -19,6 +20,7 @@ export function framePreview(
     const message: RenderMessage = { type: RENDER_TYPE, ...payload };
     // The frame has an opaque origin, so "*" is the only target that reaches it.
     frame.contentWindow?.postMessage(message, "*");
+    onReady?.();
   };
   doc.defaultView?.addEventListener("message", onMessage);
   container.append(frame);

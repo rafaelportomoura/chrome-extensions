@@ -37,6 +37,31 @@ function click(label: string): void {
 const host = () => document.querySelector<HTMLElement>(`[${ADDED_ATTRIBUTE}="preview"]`);
 
 describe("PreviewController", () => {
+  it("shows a loading message in the preview area until the frame is ready, and drops it on error", async () => {
+    openViewer();
+    let release: (text: string) => void = () => undefined;
+    const pending = new Promise<string | null>((resolve) => {
+      release = resolve;
+    });
+    const controller = new PreviewController(deps({ requestEditorText: () => pending }));
+    const shown = controller.show(current());
+    expect(host()?.textContent).toContain("Loading preview…");
+    release(EDITOR_TEXT);
+    await shown;
+    expect(host()?.querySelector("iframe")).not.toBeNull();
+
+    openViewer();
+    await new PreviewController(
+      deps({
+        requestEditorText: async () => null,
+        fetchAttachmentText: async () => {
+          throw new PreviewError("nope");
+        },
+      }),
+    ).show(current());
+    expect(host()).toBeNull();
+  });
+
   it("shows the Preview by default, from the editor text", async () => {
     openViewer();
     const d = deps();
