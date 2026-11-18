@@ -14,6 +14,7 @@ Built with `pnpm --filter jira-attachment-preview build`; load
 | `src/content.ts`, `src/preview-controller.ts`                             | Content script: watches the viewer, loads the file, frames the Preview, toggle.   |
 | `src/viewer.ts`                                                           | Attachment viewer DOM: file name and size, controls, Preview host, cleanup.       |
 | `src/page.ts`, `src/editor-source.ts`                                     | Page-world script that hands the viewer editor's full text to the content script. |
+| `src/extension-context.ts`                                                | Detects a content script orphaned by an extension reload.                         |
 | `src/rest-source.ts`                                                      | Fallback: finds and downloads the attachment through Jira's REST API.             |
 | `src/file-type.ts`                                                        | Supported extensions, displayed-size parsing, the 5 MB limit.                     |
 | `src/selectors.ts`                                                        | Jira attachment viewer selectors shared by both worlds.                           |
@@ -89,6 +90,9 @@ Nothing leaves the browser: the file is read from the page or from the same Jira
   one unit away from the size Jira shows (e.g. "14 KB" accepts 13–15 KB).
 - Reading the editor depends on a Jira internal (CodeMirror's `cmView`); if Jira changes it, the
   REST fallback takes over.
+- After the extension is reloaded at `chrome://extensions`, Jira tabs that were already open keep
+  an orphaned content script that cannot reach the extension. The controls then show "extension
+  was reloaded: reload this page"; reloading the tab fixes it.
 - The new-tab Preview is a snapshot and expires when the browser closes.
 - Excalidraw Previews are view only: element links are not clickable and embeds (YouTube etc.)
   show Excalidraw's placeholder. Obsidian's `.excalidraw.md` stays a Markdown Preview, and
