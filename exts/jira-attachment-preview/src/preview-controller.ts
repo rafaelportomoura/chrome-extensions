@@ -221,11 +221,14 @@ export class PreviewController {
       return;
     }
     log("sending the snapshot to the background worker", file.name);
-    Promise.resolve()
-      .then(() => this.deps.sendMessage({ type: OPEN_TAB_TYPE, snapshot }))
-      .then(
-        () => log("background worker received the snapshot", file.name),
-        (error: unknown) => logError("sending the snapshot failed", file.name, error),
-      );
+    const failed = (error: unknown): void =>
+      logError("sending the snapshot failed", file.name, error);
+    try {
+      this.deps
+        .sendMessage({ type: OPEN_TAB_TYPE, snapshot })
+        .then(() => log("background worker received the snapshot", file.name), failed);
+    } catch (error) {
+      failed(error);
+    }
   }
 }
