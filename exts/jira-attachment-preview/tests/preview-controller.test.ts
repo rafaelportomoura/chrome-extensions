@@ -45,7 +45,7 @@ describe("PreviewController", () => {
     });
     const controller = new PreviewController(deps({ requestEditorText: () => pending }));
     const shown = controller.show(current());
-    expect(host()?.textContent).toContain("Loading preview…");
+    expect(host()?.textContent).toContain("Reading the file from Jira's viewer…");
     release(EDITOR_TEXT);
     await shown;
     expect(host()?.querySelector("iframe")).not.toBeNull();
@@ -60,6 +60,32 @@ describe("PreviewController", () => {
       }),
     ).show(current());
     expect(host()).toBeNull();
+  });
+
+  it("names the step the load is at, in the preview area and in the controls", async () => {
+    openViewer();
+    const steps: string[] = [];
+    let release: (text: string | null) => void = () => undefined;
+    const pending = new Promise<string | null>((resolve) => {
+      release = resolve;
+    });
+    const controller = new PreviewController(
+      deps({
+        requestEditorText: () => pending,
+        fetchAttachmentText: async (input) => {
+          input.onStep?.("Downloading the attachment from Jira…");
+          steps.push(host()?.textContent ?? "");
+          return EDITOR_TEXT;
+        },
+      }),
+    );
+    const shown = controller.show(current());
+    expect(host()?.textContent).toContain("Reading the file from Jira's viewer…");
+    expect(status()).toBe("Reading the file from Jira's viewer…");
+    release(null);
+    await shown;
+    expect(steps[0]).toContain("Downloading the attachment from Jira…");
+    expect(host()?.textContent).not.toContain("Downloading");
   });
 
   it("shows the Preview by default, from the editor text", async () => {
@@ -112,6 +138,7 @@ describe("PreviewController", () => {
       pageUrl: "https://example.atlassian.net/browse/S-1",
       fileName: "proto.html",
       sizeText: "html · 14 KB",
+      onStep: expect.any(Function),
     });
     expect(host()).not.toBeNull();
   });

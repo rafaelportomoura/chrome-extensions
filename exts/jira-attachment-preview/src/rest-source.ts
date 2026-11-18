@@ -42,6 +42,8 @@ export interface RestSourceInput {
   fileName: string;
   sizeText: string;
   fetchFn?: typeof fetch;
+  /** Called as the download moves from one step to the next. */
+  onStep?: (step: string) => void;
 }
 
 async function getOk(fetchFn: typeof fetch, url: string): Promise<Response> {
@@ -57,6 +59,7 @@ export async function fetchAttachmentText(input: RestSourceInput): Promise<strin
   if (!key) throw new PreviewError("issue not found");
   const origin = new URL(input.pageUrl).origin;
 
+  input.onStep?.("Looking up the attachment in Jira…");
   const issue = (await (
     await getOk(fetchFn, `${origin}/rest/api/3/issue/${key}?fields=attachment`)
   ).json()) as { fields?: { attachment?: Attachment[] } };
@@ -68,6 +71,7 @@ export async function fetchAttachmentText(input: RestSourceInput): Promise<strin
   if (!attachment) throw new PreviewError("attachment not found");
   if (attachment.size > MAX_PREVIEW_BYTES) throw new PreviewError(TOO_LARGE_REASON);
 
+  input.onStep?.("Downloading the attachment from Jira…");
   const content = await getOk(
     fetchFn,
     `${origin}/rest/api/3/attachment/content/${attachment.id}?redirect=false`,

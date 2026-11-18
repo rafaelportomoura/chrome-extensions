@@ -131,7 +131,7 @@ export function mountControls(file: ViewerFile, handlers: ControlsHandlers): Con
   return {
     root,
     setState(state, message) {
-      status.textContent = state === "loading" ? "Loading preview…" : (message ?? "");
+      status.textContent = message ?? (state === "loading" ? LOADING_TEXT : "");
       const ready = state === "preview" || state === "source";
       preview.disabled = !ready;
       openTab.disabled = !ready;
@@ -173,8 +173,15 @@ export function mountPreviewHost(file: ViewerFile): HTMLElement {
 
 export const LOADING_TEXT = "Loading preview…";
 
-/** Fills the Preview host with a spinner and a message; returns a function that removes them. */
-export function showLoading(host: HTMLElement): () => void {
+export interface Loading {
+  /** Shows the step the load is at, under the spinner. */
+  setStep(step: string): void;
+  /** Removes the spinner and the message. */
+  hide(): void;
+}
+
+/** Fills the Preview host with a spinner and a message that names the current step. */
+export function showLoading(host: HTMLElement): Loading {
   const doc = host.ownerDocument;
   const overlay = doc.createElement("div");
   overlay.setAttribute("role", "status");
@@ -191,5 +198,10 @@ export function showLoading(host: HTMLElement): () => void {
   text.textContent = LOADING_TEXT;
   overlay.append(text);
   host.append(overlay);
-  return () => overlay.remove();
+  return {
+    setStep: (step) => {
+      text.textContent = step;
+    },
+    hide: () => overlay.remove(),
+  };
 }

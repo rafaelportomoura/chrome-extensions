@@ -79,17 +79,24 @@ export class PreviewController {
     controls.setState("loading");
     const host = mountPreviewHost(file);
     this.host = host;
-    const hideLoading = showLoading(host);
+    const loading = showLoading(host);
+    const step = (text: string): void => {
+      if (generation !== this.generation) return;
+      loading.setStep(text);
+      controls.setState("loading", text);
+    };
 
     try {
-      const content = await this.loadContent(file, generation);
+      const content = await this.loadContent(file, generation, step);
       if (generation !== this.generation) return;
-      if (kind === "excalidraw" && !parseScene(content)) {
-        throw new PreviewError(INVALID_EXCALIDRAW_REASON);
+      if (kind === "excalidraw") {
+        step("Checking the Excalidraw scene…");
+        if (!parseScene(content)) throw new PreviewError(INVALID_EXCALIDRAW_REASON);
       }
       const payload = this.payload(file, kind, content);
       this.lastPayload = payload;
-      framePreview(host, payload, this.deps.previewUrl(kind), hideLoading);
+      step("Rendering the preview…");
+      framePreview(host, payload, this.deps.previewUrl(kind), loading.hide);
       controls.setState("preview");
       log("preview shown", file.name);
     } catch (error) {
@@ -103,12 +110,17 @@ export class PreviewController {
     }
   }
 
-  private async loadContent(file: ViewerFile, generation: number): Promise<string> {
+  private async loadContent(
+    file: ViewerFile,
+    generation: number,
+    step: (text: string) => void,
+  ): Promise<string> {
+    step("Checking the file…");
     const displayed = parseDisplayedSize(file.sizeText);
     if (displayed && displayed.bytes - displayed.unit / 2 > MAX_PREVIEW_BYTES) {
       throw new PreviewError(TOO_LARGE_REASON);
     }
-    const editor = await this.editorText(file, displayed, generation);
+    const editor = await this.editorText(file, displayed, generation, step);
     let content = editor.text;
     if (content === null) {
       try {
@@ -116,6 +128,7 @@ export class PreviewController {
           pageUrl: this.deps.pageUrl(),
           fileName: file.name,
           sizeText: file.sizeText,
+          onStep: step,
         });
       } catch (error) {
         // Two attachments can share their content: then the "previous file" text is right.
@@ -138,13 +151,16 @@ export class PreviewController {
     file: ViewerFile,
     displayed: DisplayedSize | null,
     generation: number,
+    step: (text: string) => void,
   ): Promise<{ text: string | null; unchanged: string | null }> {
     const fileKey = `${file.name}\n${file.sizeText}`;
     const previous = this.lastEditorRead;
     const isStale = (text: string | null): boolean =>
       text !== null && previous !== null && previous.fileKey !== fileKey && text === previous.text;
+    step("Reading the file from Jira's viewer…");
     let text = await this.deps.requestEditorText(this.deps.win);
     for (let retry = 0; isStale(text) && retry < STALE_RETRIES; retry++) {
+      step("Waiting for Jira to switch files…");
       await new Promise((resolve) => setTimeout(resolve, STALE_RETRY_MS));
       if (generation !== this.generation) return { text: null, unchanged: null };
       text = await this.deps.requestEditorText(this.deps.win);
