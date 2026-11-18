@@ -1,5 +1,6 @@
 // Snapshots handed from a Jira page to the new-tab page through chrome.storage.session, which
 // content scripts cannot reach and which is cleared when the browser closes.
+import { log } from "./log";
 import type { PreviewPayload } from "./messages";
 
 const KEY_PREFIX = "snapshot:";
@@ -25,7 +26,9 @@ export async function openSnapshotTab(snapshot: PreviewPayload): Promise<void> {
     await clearSnapshots();
     await chrome.storage.session.set(item);
   }
+  log("snapshot stored", id, snapshot.fileName);
   await chrome.tabs.create({ url: chrome.runtime.getURL(`tab.html?id=${id}`) });
+  log("new tab opened", id);
 }
 
 /** The stored snapshot, or null when it is gone (browser restarted) or the id is unknown. */

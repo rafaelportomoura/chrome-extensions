@@ -1,5 +1,7 @@
 // Renders one Preview sent by the parent of the sandbox page: an HTML file replaces the page;
 // Markdown is rendered into it. The listener is shared with the Excalidraw page.
+
+import { log } from "./log";
 import { type MermaidApi, markdownToSafeHtml, renderMermaidBlocks } from "./markdown";
 import { isRenderMessage, READY_TYPE, type RenderMessage } from "./messages";
 
@@ -31,8 +33,10 @@ export function listenForRender(
   const onMessage = (event: MessageEvent): void => {
     if (event.source !== win.parent || !isRenderMessage(event.data)) return;
     win.removeEventListener("message", onMessage);
+    log("sandbox page rendering", event.data.fileName, event.data.kind);
     void render(win.document, event.data);
   };
   win.addEventListener("message", onMessage);
+  log("sandbox page loaded; reporting ready");
   win.parent.postMessage({ type: READY_TYPE }, "*");
 }

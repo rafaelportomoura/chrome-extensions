@@ -41,6 +41,38 @@ describe("framePreview", () => {
     expect(post).toHaveBeenCalledWith({ type: RENDER_TYPE, ...payload }, "*");
   });
 
+  it("sends the payload again when the frame reloads and reports ready again", () => {
+    const frame = framePreview(document.body, payload, "about:blank");
+    const target = frame.contentWindow;
+    if (!target) throw new Error("no frame window");
+    const post = vi.spyOn(target, "postMessage");
+    const ready = () =>
+      window.dispatchEvent(
+        new MessageEvent("message", {
+          data: { type: "jira-attachment-preview:ready" },
+          source: target,
+        }),
+      );
+    ready();
+    ready();
+    expect(post).toHaveBeenCalledTimes(2);
+  });
+
+  it("stops listening once the frame has left the page", () => {
+    const frame = framePreview(document.body, payload, "about:blank");
+    const target = frame.contentWindow;
+    if (!target) throw new Error("no frame window");
+    const post = vi.spyOn(target, "postMessage");
+    frame.remove();
+    window.dispatchEvent(
+      new MessageEvent("message", {
+        data: { type: "jira-attachment-preview:ready" },
+        source: target,
+      }),
+    );
+    expect(post).not.toHaveBeenCalled();
+  });
+
   it("ignores ready messages from other windows", () => {
     const frame = framePreview(document.body, payload, "about:blank");
     const target = frame.contentWindow;

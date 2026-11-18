@@ -1,5 +1,6 @@
 // The new-tab page: shows a stored snapshot in the same sandboxed preview page as the viewer.
 import { previewPage } from "./file-type";
+import { log } from "./log";
 import { framePreview } from "./preview-frame";
 import { loadSnapshot } from "./snapshot";
 
@@ -9,12 +10,14 @@ export async function showSnapshot(doc: Document, search: string): Promise<void>
   const snapshot = await loadSnapshot(new URLSearchParams(search).get("id"));
   const main = doc.querySelector<HTMLElement>("main") ?? doc.body;
   if (!snapshot) {
+    log("snapshot not found; showing the expired message");
     const message = doc.createElement("p");
     message.className = "expired";
     message.textContent = EXPIRED_TEXT;
     main.replaceChildren(message);
     return;
   }
+  log("snapshot loaded", snapshot.fileName);
   doc.title = snapshot.fileName;
   framePreview(main, snapshot, chrome.runtime.getURL(previewPage(snapshot.kind)));
 }

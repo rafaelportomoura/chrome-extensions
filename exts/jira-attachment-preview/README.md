@@ -93,6 +93,11 @@ Nothing leaves the browser: the file is read from the page or from the same Jira
 - After the extension is reloaded at `chrome://extensions`, Jira tabs that were already open keep
   an orphaned content script that cannot reach the extension (Chrome reports "Extension context invalidated"). The controls then show "extension
   was reloaded: reload this page"; reloading the tab fixes it.
+- The extension logs every step of a load, every click on its buttons, the page's visibility
+  changes and the new-tab hand-off, all prefixed `[jira-attachment-preview]`: filter the Jira
+  page console by it (the background worker and new-tab page have their own consoles). A Preview
+  frame that reloads, for example when its tab comes back to the foreground, is sent its content
+  again.
 - The new-tab Preview is a snapshot and expires when the browser closes.
 - Excalidraw Previews are view only: element links are not clickable and embeds (YouTube etc.)
   show Excalidraw's placeholder. Obsidian's `.excalidraw.md` stays a Markdown Preview, and

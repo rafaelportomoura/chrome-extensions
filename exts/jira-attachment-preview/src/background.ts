@@ -5,6 +5,7 @@ import { openSnapshotTab } from "./snapshot";
 
 chrome.runtime.onMessage.addListener((message: OpenTabMessage) => {
   if (message?.type !== OPEN_TAB_TYPE) return false;
+  log("open-tab message received", message.snapshot.fileName);
   openSnapshotTab(message.snapshot).catch((error: unknown) => log("open tab failed", error));
   return false;
 });

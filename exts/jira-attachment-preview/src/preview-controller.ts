@@ -67,14 +67,30 @@ export class PreviewController {
     this.controls = null;
     this.host = null;
     this.lastPayload = null;
-    if (!file) return;
+    if (!file) {
+      log("viewer closed");
+      return;
+    }
     const kind = previewKind(file.name);
-    if (!kind) return;
+    if (!kind) {
+      log("viewer opened; no preview for this file type", file.name);
+      return;
+    }
+    log("viewer opened", file.name, file.sizeText, kind);
 
     const controls = mountControls(file, {
-      onPreview: () => this.setVisible(true),
-      onSource: () => this.setVisible(false),
-      onOpenTab: () => this.openTab(file, kind),
+      onPreview: () => {
+        log("click: Preview", file.name);
+        this.setVisible(true);
+      },
+      onSource: () => {
+        log("click: Source", file.name);
+        this.setVisible(false);
+      },
+      onOpenTab: () => {
+        log("click: Open in new tab", file.name);
+        this.openTab(file, kind);
+      },
     });
     this.controls = controls;
     controls.setState("loading");
@@ -83,6 +99,7 @@ export class PreviewController {
     const loading = showLoading(host);
     const step = (text: string): void => {
       if (generation !== this.generation) return;
+      log("step:", text, file.name);
       loading.setStep(text);
       controls.setState("loading", text);
     };
@@ -129,6 +146,7 @@ export class PreviewController {
     const editor = await this.editorText(file, displayed, generation, step);
     let content = editor.text;
     if (content === null) {
+      log("no usable editor text; reading the file through Jira REST", file.name);
       try {
         content = await this.deps.fetchAttachmentText({
           pageUrl: this.deps.pageUrl(),
@@ -144,6 +162,7 @@ export class PreviewController {
       }
     }
     if (byteLength(content) > MAX_PREVIEW_BYTES) throw new PreviewError(TOO_LARGE_REASON);
+    log("content loaded", file.name, `${byteLength(content)} bytes`);
     return content;
   }
 
@@ -181,6 +200,7 @@ export class PreviewController {
       return { text: null, unchanged: null };
     }
     if (generation === this.generation) this.lastEditorRead = { fileKey, text };
+    log("read the file from the viewer's editor", file.name);
     return { text, unchanged: null };
   }
 
@@ -196,7 +216,16 @@ export class PreviewController {
 
   private openTab(file: ViewerFile, kind: PreviewKind): void {
     const snapshot = this.lastPayload;
-    if (!snapshot || snapshot.fileName !== file.name || snapshot.kind !== kind) return;
-    void this.deps.sendMessage({ type: OPEN_TAB_TYPE, snapshot });
+    if (!snapshot || snapshot.fileName !== file.name || snapshot.kind !== kind) {
+      log("open in new tab skipped: the preview is not loaded", file.name);
+      return;
+    }
+    log("sending the snapshot to the background worker", file.name);
+    Promise.resolve()
+      .then(() => this.deps.sendMessage({ type: OPEN_TAB_TYPE, snapshot }))
+      .then(
+        () => log("background worker received the snapshot", file.name),
+        (error: unknown) => logError("sending the snapshot failed", file.name, error),
+      );
   }
 }
