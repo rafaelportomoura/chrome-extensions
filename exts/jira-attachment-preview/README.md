@@ -91,7 +91,7 @@ Nothing leaves the browser: the file is read from the page or from the same Jira
 - Reading the editor depends on a Jira internal (CodeMirror's `cmView`); if Jira changes it, the
   REST fallback takes over.
 - After the extension is reloaded at `chrome://extensions`, Jira tabs that were already open keep
-  an orphaned content script that cannot reach the extension. The controls then show "extension
+  an orphaned content script that cannot reach the extension (Chrome reports "Extension context invalidated"). The controls then show "extension
   was reloaded: reload this page"; reloading the tab fixes it.
 - The new-tab Preview is a snapshot and expires when the browser closes.
 - Excalidraw Previews are view only: element links are not clickable and embeds (YouTube etc.)

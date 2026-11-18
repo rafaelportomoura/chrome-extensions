@@ -2,6 +2,7 @@
 // the sandboxed preview page and handles the toggle.
 
 import { INVALID_EXCALIDRAW_REASON, parseScene } from "./excalidraw-scene";
+import { EXTENSION_RELOADED_REASON, isContextInvalidated } from "./extension-context";
 import {
   byteLength,
   type DisplayedSize,
@@ -103,9 +104,14 @@ export class PreviewController {
       if (generation !== this.generation) return;
       host.remove();
       this.host = null;
-      const reason = error instanceof PreviewError ? error.message : "could not load the file";
-      if (!(error instanceof PreviewError)) logError("preview failed", file.name, error);
-      else log("no preview", file.name, reason);
+      const orphaned = isContextInvalidated(error);
+      const reason = orphaned
+        ? EXTENSION_RELOADED_REASON
+        : error instanceof PreviewError
+          ? error.message
+          : "could not load the file";
+      if (error instanceof PreviewError || orphaned) log("no preview", file.name, reason);
+      else logError("preview failed", file.name, error);
       controls.setState("error", reason);
     }
   }

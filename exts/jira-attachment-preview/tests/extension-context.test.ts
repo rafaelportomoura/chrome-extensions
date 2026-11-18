@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { EXTENSION_RELOADED_REASON, extensionRuntime } from "../src/extension-context";
+import {
+  EXTENSION_RELOADED_REASON,
+  extensionRuntime,
+  isContextInvalidated,
+} from "../src/extension-context";
 import { PreviewError } from "../src/preview-error";
 
 describe("extensionRuntime", () => {
@@ -14,5 +18,13 @@ describe("extensionRuntime", () => {
       expect(call).toThrow(PreviewError);
       expect(call).toThrow(EXTENSION_RELOADED_REASON);
     }
+  });
+});
+
+describe("isContextInvalidated", () => {
+  it("recognises Chrome's orphaned-content-script error only", () => {
+    expect(isContextInvalidated(new Error("Extension context invalidated."))).toBe(true);
+    expect(isContextInvalidated(new Error("Jira returned 404"))).toBe(false);
+    expect(isContextInvalidated("Extension context invalidated.")).toBe(false);
   });
 });

@@ -88,6 +88,19 @@ describe("PreviewController", () => {
     expect(host()?.textContent).not.toContain("Downloading");
   });
 
+  it("tells the user to reload the page when the extension context was invalidated", async () => {
+    openViewer();
+    await new PreviewController(
+      deps({
+        previewUrl: () => {
+          throw new Error("Extension context invalidated.");
+        },
+      }),
+    ).show(current());
+    expect(status()).toBe("extension was reloaded: reload this page");
+    expect(host()).toBeNull();
+  });
+
   it("shows the Preview by default, from the editor text", async () => {
     openViewer();
     const d = deps();

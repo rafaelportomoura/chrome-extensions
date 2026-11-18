@@ -1,6 +1,7 @@
 // Guards the chrome.runtime calls of a content script. When the extension is reloaded or updated,
 // the content script already injected in an open page loses its connection to it and
-// `chrome.runtime` becomes undefined, until the page is reloaded.
+// `chrome.runtime` becomes undefined or its calls throw "Extension context invalidated", until
+// the page is reloaded.
 import { PreviewError } from "./preview-error";
 
 export const EXTENSION_RELOADED_REASON = "extension was reloaded: reload this page";
@@ -9,4 +10,9 @@ export const EXTENSION_RELOADED_REASON = "extension was reloaded: reload this pa
 export function extensionRuntime(chromeApi: typeof chrome = chrome): typeof chrome.runtime {
   if (!chromeApi.runtime?.id) throw new PreviewError(EXTENSION_RELOADED_REASON);
   return chromeApi.runtime;
+}
+
+/** True for the error Chrome throws from a chrome.* call made by an orphaned content script. */
+export function isContextInvalidated(error: unknown): boolean {
+  return error instanceof Error && /extension context invalidated/i.test(error.message);
 }
